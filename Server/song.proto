@@ -1,0 +1,5 @@
+message Song {
+	required string title = 1;
+	required string checksum = 2;
+	required int32 lenOfSong = 3;
+}

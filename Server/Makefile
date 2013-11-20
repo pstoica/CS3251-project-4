@@ -8,7 +8,7 @@
 #################################################################
 
 CC=gcc
-LDFLAGS=-lssl -lcrypto
+LDFLAGS=-lssl -lcrypto -lprotobuf-c
 
 OS := $(shell uname -s)
 

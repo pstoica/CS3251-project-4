@@ -13,6 +13,8 @@
 #include <sys/types.h>		 /* files */
 #include <sys/stat.h>		 /* files */
 #include <dirent.h>					/* for determining files in current directory */
+#include "song.pb-c.h"
+#include "header.pb-c.h"
 
  
 /* Constants */

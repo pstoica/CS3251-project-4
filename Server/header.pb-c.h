@@ -9,57 +9,57 @@
 PROTOBUF_C_BEGIN_DECLS
 
 
-typedef struct _Header Header;
+typedef struct _Com__Example__Myfirstapp__Header Com__Example__Myfirstapp__Header;
 
 
 /* --- enums --- */
 
-typedef enum _Header__MethodType {
-  HEADER__METHOD_TYPE__LIST = 0,
-  HEADER__METHOD_TYPE__DIFF = 1,
-  HEADER__METHOD_TYPE__PULL = 2,
-  HEADER__METHOD_TYPE__LEAVE = 3,
-  HEADER__METHOD_TYPE__CAP = 4
-    _PROTOBUF_C_FORCE_ENUM_TO_BE_INT_SIZE(HEADER__METHOD_TYPE)
-} Header__MethodType;
+typedef enum _Com__Example__Myfirstapp__Header__MethodType {
+  COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE__LIST = 0,
+  COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE__DIFF = 1,
+  COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE__PULL = 2,
+  COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE__LEAVE = 3,
+  COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE__CAP = 4
+    _PROTOBUF_C_FORCE_ENUM_TO_BE_INT_SIZE(COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE)
+} Com__Example__Myfirstapp__Header__MethodType;
 
 /* --- messages --- */
 
-struct  _Header
+struct  _Com__Example__Myfirstapp__Header
 {
   ProtobufCMessage base;
-  Header__MethodType method;
+  Com__Example__Myfirstapp__Header__MethodType method;
   int32_t length;
   int32_t indexes;
 };
-#define HEADER__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&header__descriptor) \
+#define COM__EXAMPLE__MYFIRSTAPP__HEADER__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&com__example__myfirstapp__header__descriptor) \
     , 0, 0, 0 }
 
 
-/* Header methods */
-void   header__init
-                     (Header         *message);
-size_t header__get_packed_size
-                     (const Header   *message);
-size_t header__pack
-                     (const Header   *message,
+/* Com__Example__Myfirstapp__Header methods */
+void   com__example__myfirstapp__header__init
+                     (Com__Example__Myfirstapp__Header         *message);
+size_t com__example__myfirstapp__header__get_packed_size
+                     (const Com__Example__Myfirstapp__Header   *message);
+size_t com__example__myfirstapp__header__pack
+                     (const Com__Example__Myfirstapp__Header   *message,
                       uint8_t             *out);
-size_t header__pack_to_buffer
-                     (const Header   *message,
+size_t com__example__myfirstapp__header__pack_to_buffer
+                     (const Com__Example__Myfirstapp__Header   *message,
                       ProtobufCBuffer     *buffer);
-Header *
-       header__unpack
+Com__Example__Myfirstapp__Header *
+       com__example__myfirstapp__header__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   header__free_unpacked
-                     (Header *message,
+void   com__example__myfirstapp__header__free_unpacked
+                     (Com__Example__Myfirstapp__Header *message,
                       ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
-typedef void (*Header_Closure)
-                 (const Header *message,
+typedef void (*Com__Example__Myfirstapp__Header_Closure)
+                 (const Com__Example__Myfirstapp__Header *message,
                   void *closure_data);
 
 /* --- services --- */
@@ -67,8 +67,8 @@ typedef void (*Header_Closure)
 
 /* --- descriptors --- */
 
-extern const ProtobufCMessageDescriptor header__descriptor;
-extern const ProtobufCEnumDescriptor    header__method_type__descriptor;
+extern const ProtobufCMessageDescriptor com__example__myfirstapp__header__descriptor;
+extern const ProtobufCEnumDescriptor    com__example__myfirstapp__header__method_type__descriptor;
 
 PROTOBUF_C_END_DECLS
 

@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+#include <regex.h>
 #include "parser.h"			/*structs and methods defined*/
 
 #define BUFSIZE 10
@@ -34,4 +36,106 @@ int parser()
 			printf("Invalid input\n");
 	}
 	return givenMethod;
+}
+
+/**
+ * This function currently only reads an XML file (assuming iTunes format)
+ * and retrieves Title, Size, Play Count & Location for each track in the XML
+ *
+ * Soon, will rework once a clear process order for DIFF, PULL and CAP are laid out
+ *   (I think that this doesn't matter until a CAP is set, but not sure)
+ *
+ * @param filename - name of the XML file to use to determine song 'popularity'
+ */
+void parseXML(char *file_name){
+	int i;
+	// Setup file handle and open file for reading
+	FILE *file = fopen(file_name, "r");
+    size_t len = 0;
+    ssize_t read;
+    if(file == NULL){
+    	printf("Open file for read error\n");
+    	return -1;
+    }
+    
+    // Setup REGEX variables and flags for smart iterative parsing
+    regex_t regex;
+    int reti;
+    char *line;
+    bool started = false;
+    bool in_song = false;
+    bool done = false;
+    int open_dict_tags = 0;
+    reti = regcomp(&regex, "<key>Tracks", 0);
+    
+    // Read the file while there are still unseen track entries
+    //  or until file runs out of lines
+    while(!done && (read = getline(&line, &len, file) != -1)){
+    	// Handle any leading spaces
+    	const char* firstNonSpace = line;
+    	int spaces = 0;
+		while(*firstNonSpace != '\0' && isspace(*firstNonSpace))
+		{
+		      ++firstNonSpace;
+		      spaces++;
+		}
+		
+		// Start parsing data once Tracks key is seen	
+    	if(!started){
+    		reti = regexec(&regex, line, 0, NULL, 0);
+    		if(!reti){
+    			started = true;
+    		}
+    	} else {
+    		// Read through Tracks dictionary entries
+    		reti = regcomp(&regex, "<dict>", 0);
+    		reti = regexec(&regex, line, 0, NULL, 0);
+    		if(!reti){
+    			open_dict_tags++;
+    			if(open_dict_tags == 2){
+					in_song = true;
+    			}
+    		} else {
+				reti = regcomp(&regex, "</dict>", 0);
+				reti = regexec(&regex, line, 0, NULL, 0);
+				if(!reti){
+					open_dict_tags--;
+					if(open_dict_tags == 1){
+						in_song = false;
+    				} else if(open_dict_tags == 0){
+    					done = true;
+    				}
+				} else if(in_song){
+					bool line_matched = false;
+					char *start;
+					char *end;
+					for(i = 0; i < 5 && !line_matched; i++){
+						// get Name, Size, Play Count & Location
+							// Name, Size, or Location (file://<file_path>/<file_name>) to ID song/file?
+						switch(i){
+							case 0: start = "<key>Name</key><string>"; end = "</string>"; break;
+							case 1: start = "<key>Size</key><integer>"; end = "</integer>"; break;
+							case 2: start = "<key>Play Count</key><integer>"; end = "</integer>"; break;
+							case 3: start = "<key>Location</key><string>"; end = "</string>"; break;
+						}
+						
+						reti = regcomp(&regex, start, 0);
+						reti = regexec(&regex, line, 0, NULL, 0);
+						char val[256];
+						memset(val, 0, sizeof(val));
+						if(!reti){
+							// store data somewhere
+							printf("%i - %s --> ", i, line);
+							size_t val_len = strlen(line) - strlen(start) - strlen(end) - spaces - 1;
+							strncpy(val, line + strlen(start) + spaces, val_len);
+							// val has value of var in it
+							printf("%s\n", val);
+							memset(val, 0, sizeof(val));
+							line_matched = true;
+						}
+					}
+				}
+			}
+		}
+    }
 }

@@ -1,7 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never" />
+    <item android:id="@+id/command_list"
+        android:title="@string/command_list" />
+    <item android:id="@+id/command_diff"
+        android:title="@string/command_diff" />
+    <item android:id="@+id/command_pull"
+        android:title="@string/command_pull" />
+    <item android:id="@+id/command_cap"
+        android:title="@string/command_cap" />
+    <item android:id="@+id/command_leave"
+        android:title="@string/command_leave" />
 </menu>

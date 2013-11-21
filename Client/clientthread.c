@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 	struct sockaddr_in servAddr;
 	memset(&servAddr, 0, sizeof(servAddr));
 	servAddr.sin_family = AF_INET;
-	servAddr.sin_addr.s_addr = inet_addr("130.207.114.22"); /* address of shuttle2 */
+	servAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); /* address of shuttle2 */
 	servAddr.sin_port = htons(2001);
 
 

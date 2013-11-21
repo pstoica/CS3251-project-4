@@ -1,12 +1,14 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "parser.h"			/*structs and methods defined*/
 
 #define BUFSIZE 10
+#define INPUT_BUFFER_MAX 32
 
 int parser()
 {
-	char *input;
+	char *input = (char *) malloc(INPUT_BUFFER_MAX);
 	char list[BUFSIZE] = "LIST";
 	char diff[BUFSIZE] = "DIFF";
 	char pull[BUFSIZE] = "PULL";
@@ -19,7 +21,10 @@ int parser()
 	{
 		//Get the method to run from the user
 		printf("Enter LIST, DIFF, PULL, or LEAVE (In all CAPS):");
-		scanf("%as", &input);
+		fgets(input, INPUT_BUFFER_MAX, stdin);
+
+		size_t length = strlen(input) - 1;
+		if (input[length] == '\n') input[length] = '\0';
 		
 		//Check the input of the user against all 4 methods
 		if (strlen(input)<BUFSIZE&&strncmp(input, "LIST", BUFSIZE) == 0)

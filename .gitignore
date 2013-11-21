@@ -53,5 +53,5 @@ local.properties
 .Spotlight-V100
 .Trashes
 
-musicClient
-musicServer
+Client/musicClient
+Server/musicServer

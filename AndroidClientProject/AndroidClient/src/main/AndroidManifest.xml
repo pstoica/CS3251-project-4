@@ -15,6 +15,10 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light">
+        <service
+            android:name=".SocketService"/>
+        <service android:name=".SocketService" />
+
         <activity
             android:name="com.example.myfirstapp.MainActivity"
             android:label="@string/app_name" >

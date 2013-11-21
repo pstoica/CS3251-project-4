@@ -1,3 +1,5 @@
+package com.example.myfirstapp;
+
 message Header {
 	enum MethodType {
 		LIST = 0;

@@ -7,50 +7,50 @@
 #endif
 
 #include "song.pb-c.h"
-void   song__init
-                     (Song         *message)
+void   com__example__myfirstapp__song__init
+                     (Com__Example__Myfirstapp__Song         *message)
 {
-  static Song init_value = SONG__INIT;
+  static Com__Example__Myfirstapp__Song init_value = COM__EXAMPLE__MYFIRSTAPP__SONG__INIT;
   *message = init_value;
 }
-size_t song__get_packed_size
-                     (const Song *message)
+size_t com__example__myfirstapp__song__get_packed_size
+                     (const Com__Example__Myfirstapp__Song *message)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &song__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &com__example__myfirstapp__song__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t song__pack
-                     (const Song *message,
+size_t com__example__myfirstapp__song__pack
+                     (const Com__Example__Myfirstapp__Song *message,
                       uint8_t       *out)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &song__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &com__example__myfirstapp__song__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t song__pack_to_buffer
-                     (const Song *message,
+size_t com__example__myfirstapp__song__pack_to_buffer
+                     (const Com__Example__Myfirstapp__Song *message,
                       ProtobufCBuffer *buffer)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &song__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &com__example__myfirstapp__song__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Song *
-       song__unpack
+Com__Example__Myfirstapp__Song *
+       com__example__myfirstapp__song__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Song *)
-     protobuf_c_message_unpack (&song__descriptor,
+  return (Com__Example__Myfirstapp__Song *)
+     protobuf_c_message_unpack (&com__example__myfirstapp__song__descriptor,
                                 allocator, len, data);
 }
-void   song__free_unpacked
-                     (Song *message,
+void   com__example__myfirstapp__song__free_unpacked
+                     (Com__Example__Myfirstapp__Song *message,
                       ProtobufCAllocator *allocator)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &song__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &com__example__myfirstapp__song__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-static const ProtobufCFieldDescriptor song__field_descriptors[3] =
+static const ProtobufCFieldDescriptor com__example__myfirstapp__song__field_descriptors[3] =
 {
   {
     "title",
@@ -58,7 +58,7 @@ static const ProtobufCFieldDescriptor song__field_descriptors[3] =
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Song, title),
+    PROTOBUF_C_OFFSETOF(Com__Example__Myfirstapp__Song, title),
     NULL,
     NULL,
     0,            /* packed */
@@ -70,7 +70,7 @@ static const ProtobufCFieldDescriptor song__field_descriptors[3] =
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Song, checksum),
+    PROTOBUF_C_OFFSETOF(Com__Example__Myfirstapp__Song, checksum),
     NULL,
     NULL,
     0,            /* packed */
@@ -82,35 +82,35 @@ static const ProtobufCFieldDescriptor song__field_descriptors[3] =
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Song, lenofsong),
+    PROTOBUF_C_OFFSETOF(Com__Example__Myfirstapp__Song, lenofsong),
     NULL,
     NULL,
     0,            /* packed */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned song__field_indices_by_name[] = {
+static const unsigned com__example__myfirstapp__song__field_indices_by_name[] = {
   1,   /* field[1] = checksum */
   2,   /* field[2] = lenOfSong */
   0,   /* field[0] = title */
 };
-static const ProtobufCIntRange song__number_ranges[1 + 1] =
+static const ProtobufCIntRange com__example__myfirstapp__song__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 3 }
 };
-const ProtobufCMessageDescriptor song__descriptor =
+const ProtobufCMessageDescriptor com__example__myfirstapp__song__descriptor =
 {
   PROTOBUF_C_MESSAGE_DESCRIPTOR_MAGIC,
+  "com.example.myfirstapp.Song",
   "Song",
-  "Song",
-  "Song",
-  "",
-  sizeof(Song),
+  "Com__Example__Myfirstapp__Song",
+  "com.example.myfirstapp",
+  sizeof(Com__Example__Myfirstapp__Song),
   3,
-  song__field_descriptors,
-  song__field_indices_by_name,
-  1,  song__number_ranges,
-  (ProtobufCMessageInit) song__init,
+  com__example__myfirstapp__song__field_descriptors,
+  com__example__myfirstapp__song__field_indices_by_name,
+  1,  com__example__myfirstapp__song__number_ranges,
+  (ProtobufCMessageInit) com__example__myfirstapp__song__init,
   NULL,NULL,NULL    /* reserved[123] */
 };

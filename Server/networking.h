@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <openssl/md5.h>
 #include <openssl/evp.h>            /* for OpenSSL EVP digest libraries/SHA256 */
+#include <openssl/sha.h>
 #include <time.h>			 /* for time delay */
 #include <sys/types.h>		 /* files */
 #include <sys/stat.h>		 /* files */
@@ -33,7 +33,7 @@ typedef struct{
 /* struct to contain info about a song */
 typedef struct {
 	char title[TITLELEN]; //length subject to change
-	unsigned char checksum[MD5_DIGEST_LENGTH];		/* computed checksum of the song */
+	unsigned char checksum[SHA256_DIGEST_LENGTH];		/* computed checksum of the song */
 	int lenOfSong;	/* length in bytes of the actual music file */	
 } song;
 

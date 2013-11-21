@@ -9,7 +9,7 @@
 PROTOBUF_C_BEGIN_DECLS
 
 
-typedef struct _Song Song;
+typedef struct _Com__Example__Myfirstapp__Song Com__Example__Myfirstapp__Song;
 
 
 /* --- enums --- */
@@ -17,41 +17,41 @@ typedef struct _Song Song;
 
 /* --- messages --- */
 
-struct  _Song
+struct  _Com__Example__Myfirstapp__Song
 {
   ProtobufCMessage base;
   char *title;
   char *checksum;
   int32_t lenofsong;
 };
-#define SONG__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&song__descriptor) \
+#define COM__EXAMPLE__MYFIRSTAPP__SONG__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&com__example__myfirstapp__song__descriptor) \
     , NULL, NULL, 0 }
 
 
-/* Song methods */
-void   song__init
-                     (Song         *message);
-size_t song__get_packed_size
-                     (const Song   *message);
-size_t song__pack
-                     (const Song   *message,
+/* Com__Example__Myfirstapp__Song methods */
+void   com__example__myfirstapp__song__init
+                     (Com__Example__Myfirstapp__Song         *message);
+size_t com__example__myfirstapp__song__get_packed_size
+                     (const Com__Example__Myfirstapp__Song   *message);
+size_t com__example__myfirstapp__song__pack
+                     (const Com__Example__Myfirstapp__Song   *message,
                       uint8_t             *out);
-size_t song__pack_to_buffer
-                     (const Song   *message,
+size_t com__example__myfirstapp__song__pack_to_buffer
+                     (const Com__Example__Myfirstapp__Song   *message,
                       ProtobufCBuffer     *buffer);
-Song *
-       song__unpack
+Com__Example__Myfirstapp__Song *
+       com__example__myfirstapp__song__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   song__free_unpacked
-                     (Song *message,
+void   com__example__myfirstapp__song__free_unpacked
+                     (Com__Example__Myfirstapp__Song *message,
                       ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
-typedef void (*Song_Closure)
-                 (const Song *message,
+typedef void (*Com__Example__Myfirstapp__Song_Closure)
+                 (const Com__Example__Myfirstapp__Song *message,
                   void *closure_data);
 
 /* --- services --- */
@@ -59,7 +59,7 @@ typedef void (*Song_Closure)
 
 /* --- descriptors --- */
 
-extern const ProtobufCMessageDescriptor song__descriptor;
+extern const ProtobufCMessageDescriptor com__example__myfirstapp__song__descriptor;
 
 PROTOBUF_C_END_DECLS
 

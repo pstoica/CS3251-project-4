@@ -7,61 +7,61 @@
 #endif
 
 #include "header.pb-c.h"
-void   header__init
-                     (Header         *message)
+void   com__example__myfirstapp__header__init
+                     (Com__Example__Myfirstapp__Header         *message)
 {
-  static Header init_value = HEADER__INIT;
+  static Com__Example__Myfirstapp__Header init_value = COM__EXAMPLE__MYFIRSTAPP__HEADER__INIT;
   *message = init_value;
 }
-size_t header__get_packed_size
-                     (const Header *message)
+size_t com__example__myfirstapp__header__get_packed_size
+                     (const Com__Example__Myfirstapp__Header *message)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &header__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &com__example__myfirstapp__header__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t header__pack
-                     (const Header *message,
+size_t com__example__myfirstapp__header__pack
+                     (const Com__Example__Myfirstapp__Header *message,
                       uint8_t       *out)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &header__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &com__example__myfirstapp__header__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t header__pack_to_buffer
-                     (const Header *message,
+size_t com__example__myfirstapp__header__pack_to_buffer
+                     (const Com__Example__Myfirstapp__Header *message,
                       ProtobufCBuffer *buffer)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &header__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &com__example__myfirstapp__header__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Header *
-       header__unpack
+Com__Example__Myfirstapp__Header *
+       com__example__myfirstapp__header__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Header *)
-     protobuf_c_message_unpack (&header__descriptor,
+  return (Com__Example__Myfirstapp__Header *)
+     protobuf_c_message_unpack (&com__example__myfirstapp__header__descriptor,
                                 allocator, len, data);
 }
-void   header__free_unpacked
-                     (Header *message,
+void   com__example__myfirstapp__header__free_unpacked
+                     (Com__Example__Myfirstapp__Header *message,
                       ProtobufCAllocator *allocator)
 {
-  PROTOBUF_C_ASSERT (message->base.descriptor == &header__descriptor);
+  PROTOBUF_C_ASSERT (message->base.descriptor == &com__example__myfirstapp__header__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-const ProtobufCEnumValue header__method_type__enum_values_by_number[5] =
+const ProtobufCEnumValue com__example__myfirstapp__header__method_type__enum_values_by_number[5] =
 {
-  { "LIST", "HEADER__METHOD_TYPE__LIST", 0 },
-  { "DIFF", "HEADER__METHOD_TYPE__DIFF", 1 },
-  { "PULL", "HEADER__METHOD_TYPE__PULL", 2 },
-  { "LEAVE", "HEADER__METHOD_TYPE__LEAVE", 3 },
-  { "CAP", "HEADER__METHOD_TYPE__CAP", 4 },
+  { "LIST", "COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE__LIST", 0 },
+  { "DIFF", "COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE__DIFF", 1 },
+  { "PULL", "COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE__PULL", 2 },
+  { "LEAVE", "COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE__LEAVE", 3 },
+  { "CAP", "COM__EXAMPLE__MYFIRSTAPP__HEADER__METHOD_TYPE__CAP", 4 },
 };
-static const ProtobufCIntRange header__method_type__value_ranges[] = {
+static const ProtobufCIntRange com__example__myfirstapp__header__method_type__value_ranges[] = {
 {0, 0},{0, 5}
 };
-const ProtobufCEnumValueIndex header__method_type__enum_values_by_name[5] =
+const ProtobufCEnumValueIndex com__example__myfirstapp__header__method_type__enum_values_by_name[5] =
 {
   { "CAP", 4 },
   { "DIFF", 1 },
@@ -69,22 +69,22 @@ const ProtobufCEnumValueIndex header__method_type__enum_values_by_name[5] =
   { "LIST", 0 },
   { "PULL", 2 },
 };
-const ProtobufCEnumDescriptor header__method_type__descriptor =
+const ProtobufCEnumDescriptor com__example__myfirstapp__header__method_type__descriptor =
 {
   PROTOBUF_C_ENUM_DESCRIPTOR_MAGIC,
-  "Header.MethodType",
+  "com.example.myfirstapp.Header.MethodType",
   "MethodType",
-  "Header__MethodType",
-  "",
+  "Com__Example__Myfirstapp__Header__MethodType",
+  "com.example.myfirstapp",
   5,
-  header__method_type__enum_values_by_number,
+  com__example__myfirstapp__header__method_type__enum_values_by_number,
   5,
-  header__method_type__enum_values_by_name,
+  com__example__myfirstapp__header__method_type__enum_values_by_name,
   1,
-  header__method_type__value_ranges,
+  com__example__myfirstapp__header__method_type__value_ranges,
   NULL,NULL,NULL,NULL   /* reserved[1234] */
 };
-static const ProtobufCFieldDescriptor header__field_descriptors[3] =
+static const ProtobufCFieldDescriptor com__example__myfirstapp__header__field_descriptors[3] =
 {
   {
     "method",
@@ -92,8 +92,8 @@ static const ProtobufCFieldDescriptor header__field_descriptors[3] =
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_ENUM,
     0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Header, method),
-    &header__method_type__descriptor,
+    PROTOBUF_C_OFFSETOF(Com__Example__Myfirstapp__Header, method),
+    &com__example__myfirstapp__header__method_type__descriptor,
     NULL,
     0,            /* packed */
     0,NULL,NULL    /* reserved1,reserved2, etc */
@@ -104,7 +104,7 @@ static const ProtobufCFieldDescriptor header__field_descriptors[3] =
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Header, length),
+    PROTOBUF_C_OFFSETOF(Com__Example__Myfirstapp__Header, length),
     NULL,
     NULL,
     0,            /* packed */
@@ -116,35 +116,35 @@ static const ProtobufCFieldDescriptor header__field_descriptors[3] =
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    PROTOBUF_C_OFFSETOF(Header, indexes),
+    PROTOBUF_C_OFFSETOF(Com__Example__Myfirstapp__Header, indexes),
     NULL,
     NULL,
     0,            /* packed */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned header__field_indices_by_name[] = {
+static const unsigned com__example__myfirstapp__header__field_indices_by_name[] = {
   2,   /* field[2] = indexes */
   1,   /* field[1] = length */
   0,   /* field[0] = method */
 };
-static const ProtobufCIntRange header__number_ranges[1 + 1] =
+static const ProtobufCIntRange com__example__myfirstapp__header__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 3 }
 };
-const ProtobufCMessageDescriptor header__descriptor =
+const ProtobufCMessageDescriptor com__example__myfirstapp__header__descriptor =
 {
   PROTOBUF_C_MESSAGE_DESCRIPTOR_MAGIC,
+  "com.example.myfirstapp.Header",
   "Header",
-  "Header",
-  "Header",
-  "",
-  sizeof(Header),
+  "Com__Example__Myfirstapp__Header",
+  "com.example.myfirstapp",
+  sizeof(Com__Example__Myfirstapp__Header),
   3,
-  header__field_descriptors,
-  header__field_indices_by_name,
-  1,  header__number_ranges,
-  (ProtobufCMessageInit) header__init,
+  com__example__myfirstapp__header__field_descriptors,
+  com__example__myfirstapp__header__field_indices_by_name,
+  1,  com__example__myfirstapp__header__number_ranges,
+  (ProtobufCMessageInit) com__example__myfirstapp__header__init,
   NULL,NULL,NULL    /* reserved[123] */
 };

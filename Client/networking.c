@@ -372,7 +372,7 @@ song *compareSongDir(song *server, int serverLen, song *client, int clientLen, i
 			int i;
 			
 			
-			if(!memcmp(server[s].checksum,client[c].checksum,MD5_DIGEST_LENGTH))
+			if(!memcmp(server[s].checksum,client[c].checksum,SHA256_DIGEST_LENGTH))
 			{
 				b=1;
 			}
@@ -439,12 +439,15 @@ int numSongsInDir()
 /* calculates check sum of the file and places it in the song struct, file pointer is set back to the beginning of the file */
 int calculateChecksum(FILE *file,song *s)
 {
-	unsigned char digest[MD5_DIGEST_LENGTH];
-	MD5_CTX mdContext;
+	unsigned char digest[SHA256_DIGEST_LENGTH];
+	EVP_MD_CTX *mdctx;
+	const EVP_MD *md;
+	int md_len;
 
-	MD5_Init (&mdContext);
-
-	int i;
+    OpenSSL_add_all_digests();
+    md = EVP_get_digestbyname("SHA256");
+    mdctx = EVP_MD_CTX_create();
+    EVP_DigestInit_ex(mdctx, md, NULL);
 	
 	int bufferSize = 500000;
 
@@ -469,18 +472,16 @@ int calculateChecksum(FILE *file,song *s)
 		
 
 		/* update md5 calculation */
-		MD5_Update (&mdContext, buff, currNumBytesToRead);
-
+		EVP_DigestUpdate(mdctx, buff, currNumBytesToRead);
 
 		/* calculate the total number of bytes read thus far */
 		bytesRead += currBytesRead;
-					
-			
 	}
 
-	MD5_Final (digest,&mdContext);
+	EVP_DigestFinal_ex(mdctx, digest, &md_len);
+	EVP_MD_CTX_destroy(mdctx);
 
-	memcpy(s->checksum,digest,MD5_DIGEST_LENGTH);
+	memcpy(s->checksum,digest,md_len);
 
 	free(buff);
 	

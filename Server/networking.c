@@ -672,6 +672,49 @@ header * receiveHeader(int sock)
 	return (header *)rcvHeadBuf;
 }
 
+Header *receiveHeaderProto(int sock) {
+	Header *header;
+	unsigned short header_len;
+	char *rcvHeadBuf;
+
+	/* protobuf does not have fixed length, receive size first */
+	recv(sock, &header_len, LENGTH_PREFIX_SIZE, 0);
+	header_len = ntohs(header_len);
+	
+	/* malloc space for head buffer */
+	rcvHeadBuf= (char *)malloc(header_len);
+	if(!rcvHeadBuf)
+		fatal_error("malloc memory for rcvHeadBuf failed\n");
+
+
+	memset(rcvHeadBuf, 0, header_len);
+		
+	int totalBytesRcvd = 0;
+	int numBytesRcvd = 0;
+
+	/* while total bytes received is less than what is expected */
+	while(totalBytesRcvd<header_len)
+	{
+		/* receive header */
+		numBytesRcvd = recv(sock, &(rcvHeadBuf[totalBytesRcvd]), header_len - totalBytesRcvd, 0);
+		if (numBytesRcvd < 0)
+	          	fatal_error("header recv failed\n");
+		totalBytesRcvd += numBytesRcvd;
+	}
+
+	header = header__unpack(NULL, totalBytesRcvd, rcvHeadBuf);
+	if (header == NULL) {
+		fprintf(stderr, "error unpacking incoming message\n");
+		exit(1);
+	}
+
+	printf("Received: method=%d",header->method);
+
+	return header;
+
+	//send(sock, &(sndBuf[bytesSent]), currBytesRead-bytesSent, 0);
+}
+
 /* receive file and return the file */
 FILE * receiveFile(FILE *file, int numBytesToWrite, int sock) 
 {

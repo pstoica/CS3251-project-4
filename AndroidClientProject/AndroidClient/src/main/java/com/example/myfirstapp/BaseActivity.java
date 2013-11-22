@@ -22,27 +22,14 @@ public abstract class BaseActivity extends Activity {
     protected SocketService mBoundService;
     protected boolean mIsBound = false;
 
-    protected ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mBoundService = ((SocketService.LocalBinder) service).getService();
-            mIsBound = true;
-            mBoundService.sendMessage("LIST");
-        }
+    public ServiceConnection mConnection;
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mBoundService = null;
-            mIsBound = false;
-        }
-    };
-
-    protected void doBindService(Intent intent) {
+    protected void doBindService(Intent intent, ServiceConnection mConnection) {
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
 
-    protected void doUnbindService() {
+    protected void doUnbindService(ServiceConnection mConnection) {
         if (mIsBound) {
             // Detach our existing connection.
             unbindService(mConnection);

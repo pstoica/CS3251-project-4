@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -20,6 +21,7 @@ import java.util.Random;
 public class SocketService extends Service {
     public static final String SERVERIP = "10.0.2.2"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
+    OutputStream out;
     PrintWriter output;
     BufferedInputStream input;
     Socket socket;
@@ -43,11 +45,26 @@ public class SocketService extends Service {
         super.onCreate();
     }
 
-    public void sendMessage(String message){
-        if (output != null && !output.checkError()) {
-            Toast.makeText(this,"Sending message: " + message, Toast.LENGTH_LONG).show();
-            output.println(message);
-            output.flush();
+    public void sendPrefixLength(short length) {
+        if (out != null) {
+            try {
+                out.write(length);
+                out.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void sendMessage(byte[] message) {
+        if (out != null) {
+            //Toast.makeText(this,"Sending message: " + message, Toast.LENGTH_LONG).show();
+            try {
+                out.write(message);
+                out.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -72,7 +89,7 @@ public class SocketService extends Service {
                 socket = new Socket(serverAddress, SERVERPORT);
 
                 try {
-                    OutputStream out = socket.getOutputStream();
+                    out = socket.getOutputStream();
                     output = new PrintWriter(out, true);
                     input = new BufferedInputStream(socket.getInputStream());
                 } catch (Exception e) {

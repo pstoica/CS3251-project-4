@@ -21,6 +21,7 @@
 #define RCVBUFSIZE 700000             /* The receive buffer size */
 #define SNDBUFSIZE 700000             /* The send buffer size */
 #define TITLELEN 150
+#define LENGTH_PREFIX_SIZE sizeof(uint16_t)
 
 
 /* struct that contains info about the method being invoked and the information to follow */

@@ -3,7 +3,10 @@ package com.example.myfirstapp;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,12 +19,32 @@ import android.widget.EditText;
 public class MainActivity extends BaseActivity {
     public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
 
+    public ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mBoundService = ((SocketService.LocalBinder) service).getService();
+            mIsBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBoundService = null;
+            mIsBound = false;
+        }
+    };
+
     @Override
     protected void onStart() {
         super.onStart();
         Intent serviceIntent = new Intent(this, SocketService.class);
         startService(serviceIntent);
-        doBindService(serviceIntent);
+        doBindService(serviceIntent, mConnection);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        doUnbindService(mConnection);
     }
 
     /*@Override

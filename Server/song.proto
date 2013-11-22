@@ -1,5 +1,3 @@
-package com.example.myfirstapp;
-
 message Song {
 	required string title = 1;
 	required string checksum = 2;

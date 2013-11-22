@@ -20,7 +20,7 @@ ifeq ($(OS), SunOS)
 all: server
 	
 server: serverthread.o networking.o
-	$(CC) -lcrypto -lpthread serverthread.o networking.o -o musicServer $(LDFLAGS)
+	$(CC) header.pb-c.c song.pb-c.c -lcrypto -lpthread serverthread.o networking.o -o musicServer $(LDFLAGS)
 	
 server.o: serverthread.c parser.h
 	$(CC) -c serverthread.c
@@ -28,7 +28,7 @@ server.o: serverthread.c parser.h
 parser.o: parser.c parser.h
 	$(CC) -c parser.c
 
-networking.o: networking.c networking.h
+networking.o: header.o song.o networking.c networking.h
 	$(CC) -c networking.c
 
 clean:

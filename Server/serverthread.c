@@ -125,13 +125,14 @@ void *ThreadMain(void *threadArgs)
 
 	while(1)
 	{
-		
-
-		header *header= receiveHeader(clientSock);
+		Header *header= receiveHeader(clientSock);
+		/*
 		int method = header->method;
 		int indexes=header->indexes;
+		*/
 
 		free(header);
+		/*
 		if(method==LIST)
 		{
 			fprintf(stderr,"LIST\n");
@@ -179,6 +180,7 @@ void *ThreadMain(void *threadArgs)
 		{
 			fatal_error("method does not exist\n");
 		}
+		*/
 
 	}
 

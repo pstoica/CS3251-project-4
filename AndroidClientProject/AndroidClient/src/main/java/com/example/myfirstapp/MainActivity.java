@@ -16,6 +16,14 @@ import android.widget.EditText;
 public class MainActivity extends BaseActivity {
     public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent serviceIntent = new Intent(this, SocketService.class);
+        startService(serviceIntent);
+        doBindService(serviceIntent);
+    }
+
     /*@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

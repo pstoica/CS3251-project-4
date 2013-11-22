@@ -3,7 +3,12 @@ package com.example.myfirstapp;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +19,37 @@ import android.os.Build;
 import android.app.ActionBar;
 
 public abstract class BaseActivity extends Activity {
+    protected SocketService mBoundService;
+    protected boolean mIsBound = false;
+
+    protected ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mBoundService = ((SocketService.LocalBinder) service).getService();
+            mIsBound = true;
+            mBoundService.sendMessage("LIST");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBoundService = null;
+            mIsBound = false;
+        }
+    };
+
+    protected void doBindService(Intent intent) {
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+
+    protected void doUnbindService() {
+        if (mIsBound) {
+            // Detach our existing connection.
+            unbindService(mConnection);
+            mIsBound = false;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -8,7 +8,9 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -18,7 +20,8 @@ import java.util.Random;
 public class SocketService extends Service {
     public static final String SERVERIP = "10.0.2.2"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
-    PrintWriter out;
+    PrintWriter output;
+    BufferedInputStream input;
     Socket socket;
     InetAddress serverAddress;
 
@@ -41,15 +44,17 @@ public class SocketService extends Service {
     }
 
     public void sendMessage(String message){
-        if (out != null && !out.checkError()) {
-            out.println(message);
-            out.flush();
+        if (output != null && !output.checkError()) {
+            Toast.makeText(this,"Sending message: " + message, Toast.LENGTH_LONG).show();
+            output.println(message);
+            output.flush();
         }
     }
 
     @Override
     public int onStartCommand(Intent intent,int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        Toast.makeText(this,"Service Connected", Toast.LENGTH_LONG).show();
         Runnable connect = new connectSocket();
         new Thread(connect).start();
         return START_STICKY;
@@ -61,21 +66,20 @@ public class SocketService extends Service {
             try {
                 //here you must put your computer's IP address.
                 serverAddress = InetAddress.getByName(SERVERIP);
-                Log.e("TCP Client", "C: Connecting...");
+                Log.d("TCP Client", "Client: Connecting...");
 
                 //create a socket to make the connection with the server
-                socket = new Socket(serverAddr, SERVERPORT);
+                socket = new Socket(serverAddress, SERVERPORT);
 
                 try {
-                    //send the message to the server
-                    out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                    Log.e("TCP Client", "C: Sent.");
-                    Log.e("TCP Client", "C: Done.");
+                    OutputStream out = socket.getOutputStream();
+                    output = new PrintWriter(out, true);
+                    input = new BufferedInputStream(socket.getInputStream());
                 } catch (Exception e) {
-                    Log.e("TCP", "S: Error", e);
+                    Log.e("TCP", "Server: Error", e);
                 }
             } catch (Exception e) {
-                Log.e("TCP", "C: Error", e);
+                Log.e("TCP", "Client: Error", e);
             }
         }
     }

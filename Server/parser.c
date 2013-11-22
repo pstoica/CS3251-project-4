@@ -6,6 +6,9 @@
 
 #define BUFSIZE 10
 
+track *track_list;
+int track_count;
+
 int parser()
 {
 	char *input;
@@ -49,6 +52,7 @@ int parser()
  */
 void parseXML(char *file_name){
 	int i;
+	track_count = 0;
 	// Setup file handle and open file for reading
 	FILE *file = fopen(file_name, "r");
     size_t len = 0;
@@ -94,6 +98,12 @@ void parseXML(char *file_name){
     			open_dict_tags++;
     			if(open_dict_tags == 2){
 					in_song = true;
+					// allocate for track entry in tracklist
+					if(track_count == 0){
+						track_list = (track *) malloc(sizeof(track));
+					} else {
+						track_list = (track *) calloc(track_list, (track_count + 1)*sizeof(track));
+					}
     			}
     		} else {
 				reti = regcomp(&regex, "</dict>", 0);
@@ -102,6 +112,7 @@ void parseXML(char *file_name){
 					open_dict_tags--;
 					if(open_dict_tags == 1){
 						in_song = false;
+						track_count++;
     				} else if(open_dict_tags == 0){
     					done = true;
     				}
@@ -124,12 +135,36 @@ void parseXML(char *file_name){
 						char val[256];
 						memset(val, 0, sizeof(val));
 						if(!reti){
-							// store data somewhere
-							printf("%i - %s --> ", i, line);
 							size_t val_len = strlen(line) - strlen(start) - strlen(end) - spaces - 1;
 							strncpy(val, line + strlen(start) + spaces, val_len);
-							// val has value of var in it
-							printf("%s\n", val);
+							
+							if(i == 1 || i == 2){
+								unsigned int nval = atoi(val);
+								if(i == 1) track_list[track_count].size = (size_t) nval;
+								else track_list[track_count].play_count = nval;
+							} else {
+								if(i == 3){
+									// file://localhost/.../filename.ext
+									// parse val to get file name from path
+									char *temp = (char *) basename(val);
+									char *title = (char *) malloc(sizeof(temp));
+									memset(title, 0, sizeof(title));
+									char *tok = strtok(temp, "%20");
+									while(tok != NULL){
+										title = strcat(title, " ");
+										title = strcat(title, tok);
+										tok = strtok(NULL, "%20");
+									}
+									
+									track_list[track_count].file_name = (char *) malloc(sizeof(title));
+									track_list[track_count].file_name = title;
+									title = NULL;
+								} else {
+									track_list[track_count].name = (char *) malloc(sizeof(val));
+									track_list[track_count].name = val;
+								}
+							}
+							
 							memset(val, 0, sizeof(val));
 							line_matched = true;
 						}

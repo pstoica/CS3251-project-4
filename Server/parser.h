@@ -8,6 +8,12 @@ typedef enum {
 	LEAVE
 } method;
 
+typedef struct {
+	char *name;
+	size_t size;
+	unsigned int play_count;
+	char *file_name;
+} track;
 
 
 #endif/*_PARSER_H_*/

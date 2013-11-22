@@ -678,6 +678,7 @@ Header *receiveHeaderProto(int sock) {
 	char *rcvHeadBuf;
 
 	/* protobuf does not have fixed length, receive size first */
+	printf("waiting to receive header\n");
 	recv(sock, &header_len, LENGTH_PREFIX_SIZE, 0);
 	header_len = ntohs(header_len);
 	
@@ -708,7 +709,7 @@ Header *receiveHeaderProto(int sock) {
 		exit(1);
 	}
 
-	printf("Received: method=%d",header->method);
+	printf("Received: method=%d\n",header->method);
 
 	return header;
 

@@ -28,7 +28,7 @@ server.o: serverthread.c parser.h
 parser.o: parser.c parser.h
 	$(CC) -c parser.c
 
-networking.o: header.o song.o networking.c networking.h
+networking.o: networking.c networking.h
 	$(CC) -c networking.c
 
 clean:

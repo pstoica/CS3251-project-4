@@ -24,6 +24,18 @@ public class MainActivity extends BaseActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             mBoundService = ((SocketService.LocalBinder) service).getService();
             mIsBound = true;
+
+            Header header = new Header.Builder()
+                    .method(Header.MethodType.LIST)
+                    .length(0)
+                    .indexes(0)
+                    .build();
+
+            byte[] data = header.toByteArray();
+            short length = (short) data.length;
+
+            mBoundService.sendPrefixLength(length);
+            mBoundService.sendMessage(data);
         }
 
         @Override

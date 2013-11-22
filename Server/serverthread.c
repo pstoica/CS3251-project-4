@@ -125,7 +125,7 @@ void *ThreadMain(void *threadArgs)
 
 	while(1)
 	{
-		Header *header= receiveHeader(clientSock);
+		Header *header= receiveHeaderProto(clientSock);
 		/*
 		int method = header->method;
 		int indexes=header->indexes;

@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@+string/Welcome to GTMyMusic!"
+            android:text="Welcome to GTMyMusic!"
             android:id="@+id/textView" />
     </LinearLayout>
 </FrameLayout>

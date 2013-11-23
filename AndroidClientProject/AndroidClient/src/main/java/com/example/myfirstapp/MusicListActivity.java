@@ -21,7 +21,7 @@ public class MusicListActivity extends BaseActivity {
                     .build();
 
             byte[] data = header.toByteArray();
-            short length = (short) data.length;
+            int length = data.length;
 
             mBoundService.sendPrefixLength(length);
             mBoundService.sendMessage(data);

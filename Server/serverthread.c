@@ -191,7 +191,7 @@ void *ThreadMain(void *threadArgs)
 
 
 
-int fatal_error(char *errormsg[])
+int fatal_error(char *errormsg)
 {
 	printf("%s", errormsg);
 	printf("\n");

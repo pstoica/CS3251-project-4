@@ -674,28 +674,25 @@ header * receiveHeader(int sock)
 
 Header *receiveHeaderProto(int sock) {
 	Header *header;
-	unsigned short header_len;
+	int header_len = 0;
+	int totalBytesRcvd = 0;
+	int numBytesRcvd = 0;
 	char *rcvHeadBuf;
 
-	/* protobuf does not have fixed length, receive size first */
+	/* protobuf does not have a fixed length, receive size first */
 	printf("waiting to receive header\n");
 	recv(sock, &header_len, LENGTH_PREFIX_SIZE, 0);
-	header_len = ntohs(header_len);
+	//header_len = ntohl(header_len); ???
 	
 	/* malloc space for head buffer */
-	rcvHeadBuf= (char *)malloc(header_len);
+	rcvHeadBuf = (char *)malloc(header_len);
 	if(!rcvHeadBuf)
 		fatal_error("malloc memory for rcvHeadBuf failed\n");
 
-
 	memset(rcvHeadBuf, 0, header_len);
-		
-	int totalBytesRcvd = 0;
-	int numBytesRcvd = 0;
 
 	/* while total bytes received is less than what is expected */
-	while(totalBytesRcvd<header_len)
-	{
+	while(totalBytesRcvd<header_len) {
 		/* receive header */
 		numBytesRcvd = recv(sock, &(rcvHeadBuf[totalBytesRcvd]), header_len - totalBytesRcvd, 0);
 		if (numBytesRcvd < 0)

@@ -13,6 +13,8 @@
 #include <sys/types.h>		 /* files */
 #include <sys/stat.h>		 /* files */
 #include <dirent.h>					/* for determining files in current directory */
+#include <protobuf-c/protobuf-c.h>
+#include <pthread.h>
 #include "song.pb-c.h"
 #include "header.pb-c.h"
 
@@ -21,8 +23,7 @@
 #define RCVBUFSIZE 700000             /* The receive buffer size */
 #define SNDBUFSIZE 700000             /* The send buffer size */
 #define TITLELEN 150
-#define LENGTH_PREFIX_SIZE sizeof(uint16_t)
-
+#define LENGTH_PREFIX_SIZE sizeof(uint32_t)
 
 /* struct that contains info about the method being invoked and the information to follow */
 typedef struct{
@@ -66,10 +67,12 @@ song *recvSongArray(int length,int sock);
 
 int sendHeader(int method,int numBytesToSend,int indexes, int sock);
 header * receiveHeader(int sock);
+Header *receiveHeaderProto(int sock);
 
 FILE * receiveFile(FILE *file, int numBytesToWrite, int sock);
 int sendFile(FILE *file, int sock);
 
+int fatal_error(char *errormsg);
 
 #endif
 

@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -22,6 +23,7 @@ public class SocketService extends Service {
     public static final String SERVERIP = "10.0.2.2"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
     OutputStream out;
+    DataOutputStream dataOutputStream;
     PrintWriter output;
     BufferedInputStream input;
     Socket socket;
@@ -45,11 +47,11 @@ public class SocketService extends Service {
         super.onCreate();
     }
 
-    public void sendPrefixLength(short length) {
+    public void sendPrefixLength(int length) {
         if (out != null) {
             try {
-                out.write(length);
-                out.flush();
+                dataOutputStream.write(length);
+                dataOutputStream.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -58,7 +60,7 @@ public class SocketService extends Service {
 
     public void sendMessage(byte[] message) {
         if (out != null) {
-            //Toast.makeText(this,"Sending message: " + message, Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"Sending message of length: " + message.length, Toast.LENGTH_LONG).show();
             try {
                 out.write(message);
                 out.flush();
@@ -91,6 +93,7 @@ public class SocketService extends Service {
                 try {
                     out = socket.getOutputStream();
                     output = new PrintWriter(out, true);
+                    dataOutputStream = new DataOutputStream(out);
                     input = new BufferedInputStream(socket.getInputStream());
                 } catch (Exception e) {
                     Log.e("TCP", "Server: Error", e);

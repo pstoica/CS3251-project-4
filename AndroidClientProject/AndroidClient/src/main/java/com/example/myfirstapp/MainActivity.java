@@ -21,27 +21,15 @@ public class MainActivity extends BaseActivity {
 
     public ServiceConnection mConnection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mBoundService = ((SocketService.LocalBinder) service).getService();
-            mIsBound = true;
-
-            Header header = new Header.Builder()
-                    .method(Header.MethodType.LIST)
-                    .length(0)
-                    .indexes(0)
-                    .build();
-
-            byte[] data = header.toByteArray();
-            short length = (short) data.length;
-
-            mBoundService.sendPrefixLength(length);
-            mBoundService.sendMessage(data);
-        }
-
-        @Override
         public void onServiceDisconnected(ComponentName name) {
             mBoundService = null;
             mIsBound = false;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mBoundService = ((SocketService.LocalBinder) service).getService();
+            mIsBound = true;
         }
     };
 

@@ -126,15 +126,12 @@ void *ThreadMain(void *threadArgs)
 	while(1)
 	{
 		Header *header= receiveHeaderProto(clientSock);
-		/*
 		int method = header->method;
-		int indexes=header->indexes;
-		*/
+		int indexes = header->indexes;
 
 		free(header);
-		/*
-		if(method==LIST)
-		{
+		
+		if(method==HEADER__METHOD_TYPE__LIST) {
 			fprintf(stderr,"LIST\n");
 		
 			if(!logFile(logStr,"LIST",ip,mutex,cond,&busy))
@@ -142,9 +139,7 @@ void *ThreadMain(void *threadArgs)
 			
 			if(!serverList(clientSock))
 				fatal_error("server list failed\n");
-		}
-		else if(method==DIFF)
-		{
+		} else if(method==HEADER__METHOD_TYPE__DIFF) {
 			fprintf(stderr,"DIFF\n");
 		
 			if(!logFile(logStr,"DIFF",ip,mutex,cond,&busy))
@@ -153,9 +148,7 @@ void *ThreadMain(void *threadArgs)
 
 			if(!serverDiff(clientSock))
 				fatal_error("server diff failed\n"); 
-		}
-		else if(method==PULL)
-		{
+		} else if(method==HEADER__METHOD_TYPE__PULL) {
 			fprintf(stderr,"PULL\n");
 		
 			if(!logFile(logStr,"PULL",ip,mutex,cond,&busy))
@@ -163,9 +156,7 @@ void *ThreadMain(void *threadArgs)
 			
 			if(!serverPull(clientSock,indexes))
 				fatal_error("server pull failed\n"); 
-		}
-		else if(method==LEAVE)
-		{
+		} else if(method==HEADER__METHOD_TYPE__LEAVE) {
 			fprintf(stderr,"LEAVE\n");
 		
 			if(!logFile(logStr,"LEAVE",ip,mutex,cond,&busy))
@@ -175,13 +166,9 @@ void *ThreadMain(void *threadArgs)
 			if(!serverLeave(clientSock))
 				fatal_error("server leave failed\n"); 
 			break;
-		}
-		else
-		{
+		} else {
 			fatal_error("method does not exist\n");
 		}
-		*/
-
 	}
 
 	free(threadArgs);

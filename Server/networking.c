@@ -605,37 +605,33 @@ song *recvSongArray(int length,int sock)
 /* pass in header struct, send struct as is, at the end of the method the header struct is freed */
 int sendHeader(int method,int numBytesToSend,int index, int sock)
 {
-	char *head;                   /* Send HeadBuffer */
-	head= (char *)malloc(sizeof(header));
-	if(!head)
-		fatal_error("malloc memory for head failed\n");
-
-	memset(head, 0, sizeof(header));
+	Header header = HEADER__INIT;
+	unsigned len;
+	void *buf;
 	
-	((header *) head)->method=method;
-	((header *) head)->length=numBytesToSend;
-	((header *) head)->indexes=index;
+	header.method = method;
+	header.length = numBytesToSend;
+	header.indexes = index;
 
-	if(!head)
-		fatal_error("header to be sent is null\n");
-		
-	if(!sock)
-		fatal_error("send header failed because sock is null \n");
-		
+	len = header__get_packed_size(&header);
+	buf = malloc(len);
+	header__pack(&header, buf);
+
 	int totalBytesSent = 0;
 	int numBytesSent = 0;
+
+	send(sock, &len, LENGTH_PREFIX_SIZE, 0);
 	
 	/* while there are still bytes left to send */
-	while(totalBytesSent <sizeof(header))
-	{
+	while(totalBytesSent < len) {
 		/* send header */
-		numBytesSent = send(sock, &(head[totalBytesSent]), sizeof(header)-totalBytesSent, 0);
+		numBytesSent = send(sock, &(buf[totalBytesSent]), len-totalBytesSent, 0);
 		if(numBytesSent<0)
 			fatal_error("header send failed");
 		totalBytesSent+=numBytesSent;
-	} 
+	}
 	
-	free(head);
+	free(buf);
 	return totalBytesSent;
 }
 
@@ -709,8 +705,6 @@ Header *receiveHeaderProto(int sock) {
 	printf("Received: method=%d\n",header->method);
 
 	return header;
-
-	//send(sock, &(sndBuf[bytesSent]), currBytesRead-bytesSent, 0);
 }
 
 /* receive file and return the file */

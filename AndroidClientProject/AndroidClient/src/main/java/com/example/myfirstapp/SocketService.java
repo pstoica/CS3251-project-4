@@ -8,6 +8,8 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.squareup.wire.Wire;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
@@ -17,9 +19,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.Random;
 
-public class SocketService extends Service {
+public class SocketService extends IntentService {
     public static final String SERVERIP = "10.0.2.2"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
     OutputStream out;
@@ -28,6 +31,7 @@ public class SocketService extends Service {
     BufferedInputStream input;
     Socket socket;
     InetAddress serverAddress;
+    Wire wire;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -58,6 +62,19 @@ public class SocketService extends Service {
         }
     }
 
+    public int receivePrefixLength() {
+        int bytes = 4;
+        byte[] receivedMessage = new byte[bytes];
+
+        try {
+            input.read(receivedMessage, 0, bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return ByteBuffer.wrap(receivedMessage).getInt();
+    }
+
     public void sendMessage(byte[] message) {
         if (out != null) {
             Toast.makeText(this,"Sending message of length: " + message.length, Toast.LENGTH_LONG).show();
@@ -68,6 +85,20 @@ public class SocketService extends Service {
                 e.printStackTrace();
             }
         }
+    }
+
+    public Header receiveHeader(int bytes) {
+        byte[] receivedMessage = new byte[bytes];
+        Header header = null;
+
+        try {
+            input.read(receivedMessage, 0, bytes);
+            header = wire.parseFrom(receivedMessage, Header.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return header;
     }
 
     @Override
@@ -95,6 +126,7 @@ public class SocketService extends Service {
                     output = new PrintWriter(out, true);
                     dataOutputStream = new DataOutputStream(out);
                     input = new BufferedInputStream(socket.getInputStream());
+                    wire = new Wire();
                 } catch (Exception e) {
                     Log.e("TCP", "Server: Error", e);
                 }

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.widget.Toast;
+
 import java.io.ByteArrayOutputStream;
 
 public class MusicListActivity extends BaseActivity {
@@ -25,6 +27,13 @@ public class MusicListActivity extends BaseActivity {
 
             mBoundService.sendPrefixLength(length);
             mBoundService.sendMessage(data);
+
+            length = mBoundService.receivePrefixLength();
+            header = mBoundService.receiveHeader(length);
+
+            System.out.println("Received method: " + header.method);
+            System.out.println("Received indexes: " + header.indexes);
+            System.out.println("Received length: " + header.length);
         }
 
         @Override

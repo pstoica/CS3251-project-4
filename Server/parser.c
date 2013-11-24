@@ -8,6 +8,7 @@
 
 track *track_list;
 int track_count;
+int *pop_order;
 
 int parser()
 {
@@ -41,12 +42,13 @@ int parser()
 	return givenMethod;
 }
 
+
+
 /**
  * This function currently only reads an XML file (assuming iTunes format)
  * and retrieves Title, Size, Play Count & Location for each track in the XML
  *
- * Soon, will rework once a clear process order for DIFF, PULL and CAP are laid out
- *   (I think that this doesn't matter until a CAP is set, but not sure)
+ * This function only needs to be called at the beginning or upon library update
  *
  * @param filename - name of the XML file to use to determine song 'popularity'
  */

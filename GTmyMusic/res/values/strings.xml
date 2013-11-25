@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">GTmyMusic</string>
+    <string name="action_settings">Settings</string>
+    <string name="welcome">Welcome to GTmyMusic Client</string>
+    <string name="send">Send</string>
+	<string-array name="commands_array">
+	    <item>LIST</item>
+	    <item>DIFF</item>
+	    <item>PULL</item>
+	    <item>CAP</item>
+	    <item>LEAVE</item>
+	</string-array>
+    
+</resources>

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.wire.Wire;
@@ -25,7 +26,7 @@ public class SocketService extends IntentService {
 		// TODO Auto-generated constructor stub
 	}
 
-	public static final String SERVERIP = "10.0.2.2"; //your computer IP address should be written here
+	public static final String SERVERIP = "127.0.0.1"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
     OutputStream out;
     DataOutputStream dataOutputStream;
@@ -105,13 +106,13 @@ public class SocketService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent,int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
+    	super.onStartCommand(intent, flags, startId);
         Toast.makeText(this,"Service Connected", Toast.LENGTH_LONG).show();
         Runnable connect = new connectSocket();
         new Thread(connect).start();
         return START_STICKY;
     }
-
+    
     class connectSocket implements Runnable {
         @Override
         public void run() {

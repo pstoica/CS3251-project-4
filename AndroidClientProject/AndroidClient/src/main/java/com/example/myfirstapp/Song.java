@@ -21,13 +21,13 @@ public final class Song extends Message {
   public final String checksum;
 
   @ProtoField(tag = 3, type = INT32, label = REQUIRED)
-  public final Integer lenOfSong;
+  public final Integer lenofsong;
 
   private Song(Builder builder) {
     super(builder);
     this.title = builder.title;
     this.checksum = builder.checksum;
-    this.lenOfSong = builder.lenOfSong;
+    this.lenofsong = builder.lenofsong;
   }
 
   @Override
@@ -37,7 +37,7 @@ public final class Song extends Message {
     Song o = (Song) other;
     return equals(title, o.title)
         && equals(checksum, o.checksum)
-        && equals(lenOfSong, o.lenOfSong);
+        && equals(lenofsong, o.lenofsong);
   }
 
   @Override
@@ -46,7 +46,7 @@ public final class Song extends Message {
     if (result == 0) {
       result = title != null ? title.hashCode() : 0;
       result = result * 37 + (checksum != null ? checksum.hashCode() : 0);
-      result = result * 37 + (lenOfSong != null ? lenOfSong.hashCode() : 0);
+      result = result * 37 + (lenofsong != null ? lenofsong.hashCode() : 0);
       hashCode = result;
     }
     return result;
@@ -56,7 +56,7 @@ public final class Song extends Message {
 
     public String title;
     public String checksum;
-    public Integer lenOfSong;
+    public Integer lenofsong;
 
     public Builder() {
     }
@@ -66,7 +66,7 @@ public final class Song extends Message {
       if (message == null) return;
       this.title = message.title;
       this.checksum = message.checksum;
-      this.lenOfSong = message.lenOfSong;
+      this.lenofsong = message.lenofsong;
     }
 
     public Builder title(String title) {
@@ -79,8 +79,8 @@ public final class Song extends Message {
       return this;
     }
 
-    public Builder lenOfSong(Integer lenOfSong) {
-      this.lenOfSong = lenOfSong;
+    public Builder lenofsong(Integer lenofsong) {
+      this.lenofsong = lenofsong;
       return this;
     }
 

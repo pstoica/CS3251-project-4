@@ -15,8 +15,7 @@
 #include <dirent.h>					/* for determining files in current directory */
 #include <protobuf-c/protobuf-c.h>
 #include <pthread.h>
-#include "song.pb-c.h"
-#include "header.pb-c.h"
+#include "structs.pb-c.h"
 
  
 /* Constants */

@@ -1,0 +1,21 @@
+package com.example.myfirstapp;
+
+message Header {
+	enum MethodType {
+		LIST = 0;
+		DIFF = 1;
+		PULL = 2;
+		LEAVE = 3;
+		CAP = 4;
+	}
+	
+	required MethodType method = 1;
+	optional int32 limit = 2;
+	repeated Song songs = 3;
+}
+
+message Song {
+	required string title = 1;
+	required string checksum = 2;
+	required int32 lenOfSong = 3;
+}

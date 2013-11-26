@@ -610,8 +610,11 @@ int sendHeader(int method,int numBytesToSend,int index, int sock)
 	void *buf;
 	
 	header.method = method;
+	
+	/* replace with repeated songs
 	header.length = numBytesToSend;
 	header.indexes = index;
+	*/
 
 	len = header__get_packed_size(&header);
 	buf = malloc(len);

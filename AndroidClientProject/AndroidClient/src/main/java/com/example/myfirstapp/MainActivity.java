@@ -60,8 +60,6 @@ public class MainActivity extends Activity {
     public void doList() {
         Header header = new Header.Builder()
                 .method(Header.MethodType.LIST)
-                .length(0)
-                .indexes(0)
                 .build();
 
         Toast.makeText(this, "doList()", Toast.LENGTH_LONG).show();
@@ -71,8 +69,6 @@ public class MainActivity extends Activity {
     public void doDiff() {
         Header header = new Header.Builder()
                 .method(Header.MethodType.LIST)
-                .length(0)
-                .indexes(0)
                 .build();
 
         new NetworkingTask().execute(header);
@@ -85,18 +81,16 @@ public class MainActivity extends Activity {
     public void doLeave() {
         Header header = new Header.Builder()
                 .method(Header.MethodType.LEAVE)
-                .length(0)
-                .indexes(0)
                 .build();
 
         new NetworkingTask().execute(header);
     }
 
     public void doCap() {
+        // use .limit to add the cap limit to the header
         Header header = new Header.Builder()
                 .method(Header.MethodType.CAP)
-                .length(0)
-                .indexes(0)
+                .limit(5)
                 .build();
 
         new NetworkingTask().execute(header);
@@ -239,7 +233,7 @@ public class MainActivity extends Activity {
 
             Header response = receiveHeader();
 
-            return response.method + " " + response.indexes + " " + response.length + "\n";
+            return response.method + "\n";
         }
 
         protected String doDiff(Header header) {

@@ -52,10 +52,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutResourceId());
         textView = (TextView) findViewById(R.id.textView);
-        textView.setMovementMethod(new ScrollingMovementMethod());
     }
 
-    public void doList() {
+    public void doList(View view) {
         Header header = new Header.Builder()
                 .method(Header.MethodType.LIST)
                 .build();
@@ -63,7 +62,7 @@ public class MainActivity extends Activity {
         new NetworkingTask().execute(header);
     }
 
-    public void doDiff() {
+    public void doDiff(View view) {
         Header header = new Header.Builder()
                 .method(Header.MethodType.LIST)
                 .build();
@@ -71,11 +70,11 @@ public class MainActivity extends Activity {
         new NetworkingTask().execute(header);
     }
 
-    public void doPull() {
+    public void doPull(View view) {
 
     }
 
-    public void doLeave() {
+    public void doLeave(View view) {
         Header header = new Header.Builder()
                 .method(Header.MethodType.LEAVE)
                 .build();
@@ -85,7 +84,7 @@ public class MainActivity extends Activity {
         MainActivity.this.finish();
     }
 
-    public void doCap() {
+    public void doCap(View view) {
         // use .limit to add the cap limit to the header
         Header header = new Header.Builder()
                 .method(Header.MethodType.CAP)
@@ -93,40 +92,6 @@ public class MainActivity extends Activity {
                 .build();
 
         new NetworkingTask().execute(header);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case R.id.command_list:
-                doList();
-                break;
-            case R.id.command_diff:
-                doDiff();
-                break;
-            case R.id.command_pull:
-                doPull();
-                break;
-            case R.id.command_leave:
-                doLeave();
-                break;
-            case R.id.command_cap:
-                doCap();
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

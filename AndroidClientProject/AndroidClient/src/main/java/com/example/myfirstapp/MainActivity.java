@@ -22,7 +22,6 @@ import android.os.Build;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -35,8 +34,8 @@ import java.nio.ByteBuffer;
 import com.squareup.wire.Wire;
 
 public class MainActivity extends Activity {
-    public static final String SERVERIP = "10.0.2.2"; //your computer IP address should be written here
-    public static final int SERVERPORT = 2001;
+    public static final String SERVERIP = "130.207.114.21"; //your computer IP address should be written here
+    public static final int SERVERPORT = 8254;
     private TextView textView;
     private boolean isConnected = false;
 
@@ -52,7 +51,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutResourceId());
-
         textView = (TextView) findViewById(R.id.textView);
         textView.setMovementMethod(new ScrollingMovementMethod());
     }

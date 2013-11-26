@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="wire-runtime-1.2.0">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/libs/wire-runtime-1.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/AndroidClient/libs/wire-runtime-1.2.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -620,7 +620,9 @@ int sendHeader(int method,int numBytesToSend,int index, int sock)
 	int totalBytesSent = 0;
 	int numBytesSent = 0;
 
-	send(sock, &len, LENGTH_PREFIX_SIZE, 0);
+	int network_length = htonl(len);
+
+	send(sock, &network_length, LENGTH_PREFIX_SIZE, 0);
 	
 	/* while there are still bytes left to send */
 	while(totalBytesSent < len) {

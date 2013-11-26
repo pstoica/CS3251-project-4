@@ -19,6 +19,7 @@
 #include <pthread.h>	/*For threads*/
 #include <sys/types.h>	/* files */
 #include <sys/stat.h>	/* files */
+#include <stdbool.h>	/* for bool type (true, false) */
 #include <dirent.h>					/* for determining files in current directory */
 #include "networking.h"
 #include "parser.h"
@@ -114,6 +115,8 @@ void *ThreadMain(void *threadArgs)
 	/* Get socket from the argument(struct) passed in */
 	int clientSock = ((ThreadArgs *) threadArgs)->clientSock;
 
+	// Flag waiting for LEAVE command to end Thread
+	bool left = false;
 
 	char *ip =(char *)malloc(strlen(((ThreadArgs *) threadArgs)->ip));
 	if(!ip)
@@ -123,7 +126,7 @@ void *ThreadMain(void *threadArgs)
 
 	char *logStr="Log_File";
 
-	while(1)
+	while(left == false)
 	{
 		Header *header= receiveHeaderProto(clientSock);
 		printf("received a header\n");
@@ -166,12 +169,15 @@ void *ThreadMain(void *threadArgs)
 
 			if(!serverLeave(clientSock))
 				fatal_error("server leave failed\n"); 
+			
+			left = true;
 			break;
 		} else {
 			fatal_error("method does not exist\n");
 		}
 	}
 
+	free(ip);
 	free(threadArgs);
 	return (NULL);
 

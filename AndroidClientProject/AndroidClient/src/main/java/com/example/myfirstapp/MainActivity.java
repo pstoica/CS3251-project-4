@@ -170,7 +170,7 @@ public class MainActivity extends Activity {
             Log.d("TCP", "Prefix: " + length);
             if (out != null) {
                 try {
-                    dataOutputStream.write(length);
+                    dataOutputStream.writeInt(length);
                     dataOutputStream.flush();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -233,7 +233,17 @@ public class MainActivity extends Activity {
 
             Header response = receiveHeader();
 
-            return response.method + "\n";
+            String result = "LIST result:\n";
+
+            if (header.songs != null) {
+                for (Song song: header.songs) {
+                    result += song.title + "\n";
+                }
+            } else {
+                result += "No songs found.\n";
+            }
+
+            return result;
         }
 
         protected String doDiff(Header header) {

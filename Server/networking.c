@@ -48,17 +48,9 @@ int serverList(int sock)
 			fatal_error("send header has failed\n");
 		return 1;
 	}
-	if(!sendHeader(0,numSongsInDir()*sizeof(song), numSongs,sock))
+	if(!sendHeaderProto(0, createSongArrayProto(numSongs), numSongs, sock))
 		fatal_error("send header has failed\n");
-
-	song *songs=createSongArray(numSongs);
-	if(!songs)
-		fatal_error("creating song array failed\n");
-		
-	if(sendSongArray(songs,numSongs,sock)!=sizeof(song)*numSongs)
-		fatal_error("sending song array failed\n"); 	
 	
-	free((void*)songs);
 	return 1;
 }
 
@@ -437,7 +429,60 @@ int numSongsInDir()
 }
 
 /* calculates check sum of the file and places it in the song struct, file pointer is set back to the beginning of the file */
-int calculateChecksum(FILE *file,song *s)
+int calculateChecksum(FILE *file,Song *s)
+{
+	unsigned char digest[SHA256_DIGEST_LENGTH];
+	EVP_MD_CTX *mdctx;
+	const EVP_MD *md;
+	int md_len;
+
+    OpenSSL_add_all_digests();
+    md = EVP_get_digestbyname("SHA256");
+    mdctx = EVP_MD_CTX_create();
+    EVP_DigestInit_ex(mdctx, md, NULL);
+	
+	int bufferSize = 500000;
+
+	char *buff = malloc(bufferSize);
+	if(!buff)
+		fatal_error("malloc failed\n");
+
+	int numBytesToRead = fileLen(file);
+	int currBytesRead =0;
+	int bytesRead = 0;
+
+	while(numBytesToRead>bytesRead)
+	{
+
+		/* checks if bytes to be read in this iteration are greater than buffer */
+		int currNumBytesToRead=(numBytesToRead-bytesRead>bufferSize)?bufferSize:numBytesToRead-bytesRead;
+
+		/* read bytes */
+		currBytesRead=fread(buff,1,currNumBytesToRead,file);
+		if(currBytesRead<= 0)
+			fatal_error("read failed\n"); 
+		
+
+		/* update md5 calculation */
+		EVP_DigestUpdate(mdctx, buff, currNumBytesToRead);
+
+		/* calculate the total number of bytes read thus far */
+		bytesRead += currBytesRead;
+	}
+
+	EVP_DigestFinal_ex(mdctx, digest, &md_len);
+	EVP_MD_CTX_destroy(mdctx);
+	s->checksum = xstrdup(digest);
+
+	free(buff);
+	
+	if(fseek(file, 0, SEEK_SET))
+		fatal_error("failed to return back to the beginning of the file\n");
+	
+	return 1;
+}
+
+char *calculateChecksumProto(FILE *file)
 {
 	unsigned char digest[SHA256_DIGEST_LENGTH];
 	EVP_MD_CTX *mdctx;
@@ -481,17 +526,15 @@ int calculateChecksum(FILE *file,song *s)
 	EVP_DigestFinal_ex(mdctx, digest, &md_len);
 	EVP_MD_CTX_destroy(mdctx);
 
-	memcpy(s->checksum,digest,md_len);
-
 	free(buff);
 	
 	if(fseek(file, 0, SEEK_SET))
 		fatal_error("failed to return back to the beginning of the file\n");
+
+	printf("czecksum: %d\n", strlen(digest));
 	
-	return 1;
+	return digest;
 }
-
-
 
 /* crawls through directory and creates an array of song structs */
 song *createSongArray(int numSongs)
@@ -536,6 +579,54 @@ song *createSongArray(int numSongs)
 		closedir(d);
 	}
 	return songBuf;
+}
+
+Song **createSongArrayProto(int numSongs) {
+	if(!numSongs)
+		return 0;
+
+	//Song *songBuf= (Song *)malloc(sizeof(song)*numSongs);
+	Song **songs;
+	songs = malloc(sizeof(Song*) * numSongs);
+
+	if(!songs)
+		fatal_error("malloc memory for songBuf failed\n");
+
+	int i =0;
+	
+	DIR *d;
+	struct dirent *dir;
+	d = opendir(".");
+	if (d)
+	{
+		while ((dir = readdir(d)) != NULL)
+		{
+			char *name=dir->d_name;
+			int len =strlen(name);
+			if(len>4&&len<TITLELEN&&name[len-4]=='.'&&name[len-3]=='m'&&name[len-2]=='p'&&name[len-1]=='3')
+			{
+				//memcpy(&(songBuf[i].title),(name),len);
+				
+				FILE *file = fopen(name,"r+");
+
+				songs[i] = malloc(sizeof(Song));
+				song__init(songs[i]);
+				//printf("checksum len: %d\n", strlen(calculateChecksumProto(file)));
+				//songs[i]->checksum = xstrdup(calculateChecksumProto(file));
+				songs[i]->checksum = "placeholder";
+				songs[i]->title = xstrdup(name);
+				songs[i]->lenofsong = fileLen(file);
+	
+				fclose(file);
+
+			
+				i++;
+			}
+		}
+
+		closedir(d);
+	}
+	return songs;
 }
 
 /* sends song array DOES NOT FREE SONG ARRAY!*/
@@ -640,6 +731,45 @@ int sendHeader(int method,int numBytesToSend,int index, int sock)
 	return totalBytesSent;
 }
 
+int sendHeaderProto(int method, Song **songs, int numSongs, int sock) {
+	Header header = HEADER__INIT;
+	unsigned len;
+	void *buf;
+	
+	header.method = method;
+	header.n_songs = numSongs;
+	header.songs = songs;
+	printf("%d\n", header.method);
+	printf("%d\n", header.n_songs);
+	printf("%s\n", header.songs[0]->title);
+	printf("%d\n", header.songs[0]->lenofsong);
+	printf("%s\n", header.songs[0]->checksum);
+
+	len = header__get_packed_size(&header);
+	buf = malloc(len);
+	header__pack(&header, buf);
+
+	int totalBytesSent = 0;
+	int numBytesSent = 0;
+
+	int network_length = htonl(len);
+
+	send(sock, &network_length, LENGTH_PREFIX_SIZE, 0);
+	
+	/* while there are still bytes left to send */
+	while(totalBytesSent < len) {
+		/* send header */
+		numBytesSent = send(sock, &(buf[totalBytesSent]), len-totalBytesSent, 0);
+		if(numBytesSent<0)
+			fatal_error("header send failed");
+		totalBytesSent+=numBytesSent;
+	}
+	
+	free(buf);
+	free(header.songs);
+	return totalBytesSent;
+}
+
 /* pass in socket that is expecting a header, receive header * to the recceived header*/
 header * receiveHeader(int sock)
 {
@@ -683,7 +813,8 @@ Header *receiveHeaderProto(int sock) {
 	/* protobuf does not have a fixed length, receive size first */
 	printf("waiting to receive header\n");
 	recv(sock, &header_len, LENGTH_PREFIX_SIZE, 0);
-	//header_len = ntohl(header_len); ???
+	header_len = ntohl(header_len);
+	printf("header_len: %d\n", header_len);
 	
 	/* malloc space for head buffer */
 	rcvHeadBuf = (char *)malloc(header_len);

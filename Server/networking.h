@@ -60,18 +60,27 @@ int logFile(char *fileName, char *method, char *ip, pthread_mutex_t *mutex, pthr
 song *compareSongDir(song *server, int serverLen, song *client, int clientLen, int *lenOfNewArr);
 int numSongsInDir();
 song *createSongArray(int numSongs);
-int calculateChecksum(FILE *file,song *s);
+int calculateChecksum(FILE *file,Song *s);
+char *calculateChecksumProto(FILE *file);
 int sendSongArray(song *songs,int num,int sock);
 song *recvSongArray(int length,int sock);
 
 int sendHeader(int method,int numBytesToSend,int indexes, int sock);
-header * receiveHeader(int sock);
+int sendHeaderProto(int method, Song **songs, int numSongs, int sock);
+header *receiveHeader(int sock);
 Header *receiveHeaderProto(int sock);
+Song **createSongArrayProto(int numSongs);
 
 FILE * receiveFile(FILE *file, int numBytesToWrite, int sock);
 int sendFile(FILE *file, int sock);
 
 int fatal_error(char *errormsg);
+
+static char *xstrdup (const char *str) {
+  if (str == NULL)
+    return NULL;
+  return strcpy (malloc (strlen (str) + 1), str);
+}
 
 #endif
 

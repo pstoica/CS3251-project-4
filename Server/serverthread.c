@@ -76,7 +76,8 @@ int main(int argc, char *argv[])
     /* Listen for incoming connections */
     if (listen(serverSock, 5) < 0)
         fatal_error("Listen failed");
-        
+
+    OpenSSL_add_all_digests();
 
     /* Loop server forever*/
     while(1) 
@@ -111,7 +112,6 @@ void *ThreadMain(void *threadArgs)
 	/* Tells the thread to deallocate resources when it returns*/
 	pthread_detach(pthread_self());
 	
-
 	/* Get socket from the argument(struct) passed in */
 	int clientSock = ((ThreadArgs *) threadArgs)->clientSock;
 

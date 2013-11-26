@@ -34,7 +34,7 @@ import java.nio.ByteBuffer;
 import com.squareup.wire.Wire;
 
 public class MainActivity extends Activity {
-    public static final String SERVERIP = "192.168.56.101"; //your computer IP address should be written here
+    public static final String SERVERIP = "10.0.2.2"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
     private TextView textView;
     private boolean isConnected = false;
@@ -60,7 +60,6 @@ public class MainActivity extends Activity {
                 .method(Header.MethodType.LIST)
                 .build();
 
-        Toast.makeText(this, "doList()", Toast.LENGTH_LONG).show();
         new NetworkingTask().execute(header);
     }
 

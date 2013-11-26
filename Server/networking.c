@@ -429,12 +429,12 @@ int numSongsInDir()
 }
 
 /* calculates check sum of the file and places it in the song struct, file pointer is set back to the beginning of the file */
-int calculateChecksum(FILE *file,Song *s)
+int calculateChecksum(FILE *file,song *s)
 {
 	unsigned char digest[SHA256_DIGEST_LENGTH];
 	EVP_MD_CTX *mdctx;
 	const EVP_MD *md;
-	int md_len;
+	unsigned int md_len;
 
     OpenSSL_add_all_digests();
     md = EVP_get_digestbyname("SHA256");
@@ -472,7 +472,6 @@ int calculateChecksum(FILE *file,Song *s)
 
 	EVP_DigestFinal_ex(mdctx, digest, &md_len);
 	EVP_MD_CTX_destroy(mdctx);
-	s->checksum = xstrdup(digest);
 
 	free(buff);
 	
@@ -482,14 +481,13 @@ int calculateChecksum(FILE *file,Song *s)
 	return 1;
 }
 
-char *calculateChecksumProto(FILE *file)
+int calculateChecksumProto(FILE *file, Song *s)
 {
-	unsigned char digest[SHA256_DIGEST_LENGTH];
+	unsigned char digest[EVP_MAX_MD_SIZE];
 	EVP_MD_CTX *mdctx;
 	const EVP_MD *md;
 	int md_len;
 
-    OpenSSL_add_all_digests();
     md = EVP_get_digestbyname("SHA256");
     mdctx = EVP_MD_CTX_create();
     EVP_DigestInit_ex(mdctx, md, NULL);
@@ -531,9 +529,13 @@ char *calculateChecksumProto(FILE *file)
 	if(fseek(file, 0, SEEK_SET))
 		fatal_error("failed to return back to the beginning of the file\n");
 
-	printf("czecksum: %d\n", strlen(digest));
+	//s->checksum = malloc(sizeof (unsigned char) * (md_len));
+	//memcpy(s->checksum, digest, md_len);
+	s->checksum.data = malloc(sizeof(unsigned char) * (md_len));
+	s->checksum.len = md_len;
+	memcpy(s->checksum.data, digest, md_len);
 	
-	return digest;
+	return 1;
 }
 
 /* crawls through directory and creates an array of song structs */
@@ -608,17 +610,15 @@ Song **createSongArrayProto(int numSongs) {
 				//memcpy(&(songBuf[i].title),(name),len);
 				
 				FILE *file = fopen(name,"r+");
+				//const unsigned char *checksum = calculateChecksumProto(file);
 
 				songs[i] = malloc(sizeof(Song));
 				song__init(songs[i]);
-				//printf("checksum len: %d\n", strlen(calculateChecksumProto(file)));
-				//songs[i]->checksum = xstrdup(calculateChecksumProto(file));
-				songs[i]->checksum = "placeholder";
 				songs[i]->title = xstrdup(name);
 				songs[i]->lenofsong = fileLen(file);
+				calculateChecksumProto(file, songs[i]);
 	
 				fclose(file);
-
 			
 				i++;
 			}
@@ -739,11 +739,6 @@ int sendHeaderProto(int method, Song **songs, int numSongs, int sock) {
 	header.method = method;
 	header.n_songs = numSongs;
 	header.songs = songs;
-	printf("%d\n", header.method);
-	printf("%d\n", header.n_songs);
-	printf("%s\n", header.songs[0]->title);
-	printf("%d\n", header.songs[0]->lenofsong);
-	printf("%s\n", header.songs[0]->checksum);
 
 	len = header__get_packed_size(&header);
 	buf = malloc(len);
@@ -814,7 +809,6 @@ Header *receiveHeaderProto(int sock) {
 	printf("waiting to receive header\n");
 	recv(sock, &header_len, LENGTH_PREFIX_SIZE, 0);
 	header_len = ntohl(header_len);
-	printf("header_len: %d\n", header_len);
 	
 	/* malloc space for head buffer */
 	rcvHeadBuf = (char *)malloc(header_len);

@@ -209,7 +209,7 @@ static const ProtobufCFieldDescriptor song__field_descriptors[3] =
     "checksum",
     2,
     PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_STRING,
+    PROTOBUF_C_TYPE_BYTES,
     0,   /* quantifier_offset */
     PROTOBUF_C_OFFSETOF(Song, checksum),
     NULL,

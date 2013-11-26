@@ -44,12 +44,12 @@ struct  _Song
 {
   ProtobufCMessage base;
   char *title;
-  char *checksum;
+  ProtobufCBinaryData checksum;
   int32_t lenofsong;
 };
 #define SONG__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&song__descriptor) \
-    , NULL, NULL, 0 }
+    , NULL, {0,NULL}, 0 }
 
 
 /* Header methods */

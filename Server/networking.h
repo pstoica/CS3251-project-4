@@ -60,8 +60,8 @@ int logFile(char *fileName, char *method, char *ip, pthread_mutex_t *mutex, pthr
 song *compareSongDir(song *server, int serverLen, song *client, int clientLen, int *lenOfNewArr);
 int numSongsInDir();
 song *createSongArray(int numSongs);
-int calculateChecksum(FILE *file,Song *s);
-char *calculateChecksumProto(FILE *file);
+int calculateChecksum(FILE *file,song *s);
+int calculateChecksumProto(FILE *file, Song *s);
 int sendSongArray(song *songs,int num,int sock);
 song *recvSongArray(int length,int sock);
 

@@ -26,12 +26,16 @@ import android.widget.Toast;
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import com.squareup.wire.Wire;
 
@@ -84,6 +88,7 @@ public class MainActivity extends Activity {
         new NetworkingTask().execute(header);
 
         MainActivity.this.finish();
+        System.exit(0);
     }
 
     public void doCap(View view) {
@@ -205,7 +210,7 @@ public class MainActivity extends Activity {
 
             if (response.songs != null) {
                 for (Song song: response.songs) {
-                    result += song.title + " -- " + song.checksum + " -- " + song.lenofsong + "\n";
+                    result += song.title + "\n";
                 }
             } else {
                 result += "No songs found.\n";
@@ -224,37 +229,76 @@ public class MainActivity extends Activity {
             File dir = new File(path);
             String file[] = dir.list();
             String songs[] = new String[file.length];
+            byte checksums[][] = new byte[file.length][4096];
             int song_cnt = 0;
             if(file != null){
                 for(int i = 0; i < file.length; i++){
                     if(file[i].endsWith(".mp3")){
                         songs[song_cnt] = file[i];
-                        Log.d("DIFF (local)", file[i]);
+
+                        try {
+                            MessageDigest md = MessageDigest.getInstance("SHA-256");
+                            DigestInputStream dis = new DigestInputStream(new FileInputStream(new File(path + file[i])), md);
+                            while(dis.read(checksums[i]) != -1);
+                            dis.close();
+                            checksums[i] = md.digest();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        String msg = "-\nName : " + file[i] + "\n Checksum: ";
+                        StringBuilder sb = new StringBuilder();
+                        for(int k = 0; k < checksums[i].length; k++){
+                            sb.append(String.format("%x", checksums[i][k]));
+                        }
+                        Log.d("DIFF (local)", msg + sb.toString());
                         song_cnt++;
                     }
                 }
             }
 
-            String result = "DIFF result (no checksum check):\n";
-            System.out.println(response.songs);
-            Log.d("DIFF (remote)", response.songs + "");
+            String result = "DIFF result:\n";
+            //System.out.println(response.songs);
+            //Log.d("DIFF (remote)", response.songs + "");
+
+            int matchMap[] = new int[response.songs.size()];
 
             if (response.songs != null) {
                 int num_matched = 0;
+                int j = 0;
                 for (Song song: response.songs) {
                     boolean found = false;
+                    byte rmcks[] = song.toByteArray();
+                    String msg1 = "-\n Name: " + song.title + "\n Checksum: ";
+                    for(int k = 0; k < rmcks.length; k++){
+                        msg1 = String.format(msg1 + "%x", rmcks[k]);
+                    }
+                    Log.d("DIFF (remote)", msg1);
+
                     for (int i = 0; i < song_cnt && !found; i++){
                         if(song.title.equals(songs[i])){
                             found = true;
+                            matchMap[j] = i;
+                            num_matched++;
                         }
                     }
                     if(!found){
                         result += song.title + "\n";
+                        matchMap[j] = -1;
                     }
+                    j++;
                 }
-                if(num_matched == 0){
-                    result += "No songs found.\n";
-                }
+
+                /* checksum check
+                if(num_matched < response.songs.size()){
+                    // compare unmatched songs to local song checksums
+                    // matchMap[song_index(res)] = local_song_index (or -1 if not matched)
+                    for(int i = 0; i < matchMap.length && num_matched < response.songs.size(); i++){
+                        if(matchMap[i] == -1){
+
+                        }
+                    }
+                }*/
             } else {
                 result += "No songs found.\n";
             }

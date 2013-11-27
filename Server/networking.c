@@ -367,8 +367,8 @@ Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clie
 		}
 		if(!found)
 		{
-			//maxList[numDiff] = server[s];
-			memcpy(maxList[numDiff],server[s],sizeof(*server[s]));
+			maxList[numDiff] = server[s];
+			//memcpy(maxList[numDiff],server[s],sizeof(*server[s]));
 			numDiff++;
 		}
 		s++;
@@ -758,7 +758,7 @@ int sendHeaderProto(int method, Song **songs, int numSongs, int sock) {
 	}
 	
 	free(buf);
-	free(header.songs);
+	//free(header.songs);
 	return totalBytesSent;
 }
 
@@ -958,7 +958,7 @@ int sendFile(FILE *file, int sock)
 
 	free(sndBuf);
 
-	fclose(file);
+	//fclose(file);
 
 	return totalFileBytesSent;
 }

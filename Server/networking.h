@@ -19,8 +19,8 @@
 
  
 /* Constants */
-#define RCVBUFSIZE 512             /* The receive buffer size */
-#define SNDBUFSIZE 512             /* The send buffer size */
+#define RCVBUFSIZE 4096             /* The receive buffer size */
+#define SNDBUFSIZE 4096             /* The send buffer size */
 #define TITLELEN 150
 #define LENGTH_PREFIX_SIZE sizeof(uint32_t)
 

@@ -19,8 +19,8 @@
 
  
 /* Constants */
-#define RCVBUFSIZE 700000             /* The receive buffer size */
-#define SNDBUFSIZE 700000             /* The send buffer size */
+#define RCVBUFSIZE 512             /* The receive buffer size */
+#define SNDBUFSIZE 512             /* The send buffer size */
 #define TITLELEN 150
 #define LENGTH_PREFIX_SIZE sizeof(uint32_t)
 
@@ -60,6 +60,7 @@ int fileLen(FILE *file);
 int logFile(char *fileName, char *method, char *ip, pthread_mutex_t *mutex, pthread_cond_t *cond, int *busy);
 
 song *compareSongDir(song *server, int serverLen, song *client, int clientLen, int *lenOfNewArr);
+Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clientLen, int *lenOfNewArr);
 int numSongsInDir();
 song *createSongArray(int numSongs);
 int calculateChecksum(FILE *file,song *s);

@@ -45,7 +45,7 @@ import com.squareup.wire.ByteString;
 import com.squareup.wire.Wire;
 
 public class MainActivity extends Activity {
-    public static final String SERVERIP = "192.168.56.101"; //your computer IP address should be written here
+    public static final String SERVERIP = "10.0.2.2"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
     public static final String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
     private TextView textView;
@@ -165,11 +165,13 @@ public class MainActivity extends Activity {
 
     public void doPull(View view) {
         Header header = new Header.Builder()
-                .method(Header.MethodType.DIFF)
+                .method(Header.MethodType.PULL)
                 .songs(getSongs())
                 .build();
 
-        //new NetworkingTask().execute(header);
+        System.out.println(header.songs);
+
+        new NetworkingTask().execute(header);
     }
 
     public void doLeave(View view) {
@@ -269,7 +271,6 @@ public class MainActivity extends Activity {
         public void sendMessage(byte[] message) {
             Log.d("TCP", "Sending message...");
             if (out != null) {
-                // Toast.makeText(this,"Sending message of length: " + message.length, Toast.LENGTH_LONG).show();
                 try {
                     out.write(message);
                     out.flush();
@@ -375,6 +376,11 @@ public class MainActivity extends Activity {
             Header response = receiveHeader();
 
             String result = "PULL result:\n";
+
+            for (Song song : response.songs) {
+                receiveFile(song);
+                result += "Received: " + song.title + "\n";
+            }
 
             return result;
         }

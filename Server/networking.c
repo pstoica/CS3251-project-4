@@ -204,88 +204,18 @@ int clientPull(int sock)
 int serverPull(int sock, Header *header)
 {	
 	int numSongs=numSongsInDir();
-	if(header->n_songs == 0)//if the client has no songs
-	{
-		if(!numSongs) //if the server has no songs
-		{
-			if(!sendHeader(2,0, 0, sock))
-				fatal_error("send header has failed\n");
-		}
-		else //if the server has songs
-		{
-			song *serverSongs=createSongArray(numSongs);
-			
-			if(!sendHeader(2,numSongs*sizeof(song), numSongs, sock))
-				fatal_error("send header has failed\n");
-			
-			if(sendSongArray(serverSongs,numSongs,sock)!=sizeof(song)*numSongs)
-				fatal_error("sending song array failed\n"); 
-				
-			int i;
-			for(i=0;i<numSongs;i++)
-			{
-				FILE *file = fopen(serverSongs[i].title,"r+");
-				if(!sendFile(file, sock))
-					fatal_error("receive file failed\n");
-			}
-			free(serverSongs);
-		}
-	}
-	else //the client has songs
-	{
-		/*
-		if(!numSongs) //if the server has no songs
-		{
-			song *rcvSongs=recvSongArray(indexes,sock);
-			if(!rcvSongs)
-				fatal_error("error receiving song array\n"); 
-				
-			if(!sendHeader(2,0, 0, sock))
-				fatal_error("send header has failed\n");
-				
-			free(rcvSongs);
-		}
-		else //the server has songs
-		{
-			song *rcvSongs=recvSongArray(indexes,sock);
-			if(!rcvSongs)
-				fatal_error("error receiving song array\n"); 
-		
-			song *serverSongs=createSongArray(numSongs);
+	int diffSongCount = 0;
+	Song **diffSongs = compareSongDirProto(createSongArrayProto(numSongs), numSongs, header->songs, header->n_songs, &diffSongCount);
 
-			int diffLen=0;		
+	sendHeaderProto(HEADER__METHOD_TYPE__PULL, diffSongs, diffSongCount, sock);
 
-			song *diffSongs = compareSongDir(serverSongs, numSongs,rcvSongs,indexes, &diffLen);
-
-			if(!diffLen) // they have the same songs
-			{
-				if(!sendHeader(2,0, 0, sock))
-					fatal_error("send header has failed\n");
-			}
-			else //they do not have the same songs
-			{
-				if(!sendHeader(2,diffLen*sizeof(song), diffLen, sock))
-					fatal_error("send header has failed\n");
-			
-				if(sendSongArray(diffSongs,diffLen,sock)!=sizeof(song)*diffLen)
-					fatal_error("sending song array failed\n"); 
-				
-				int i;
-				for(i=0;i<diffLen;i++)
-				{
-					FILE *file = fopen(diffSongs[i].title,"r+");
-					if(!sendFile(file, sock))
-						fatal_error("receive file failed\n");
-					
-				}
-			}
-			free(rcvSongs);
-			free(diffSongs);
-			free(serverSongs);
-		}*/
+	for (int i = 0; i < diffSongCount; i++) {
+		FILE *file = fopen(diffSongs[i]->title,"r+");
+		if(!sendFile(file, sock))
+			fatal_error("receive file failed\n");
 	}
 	
-	return 1;	
+	return 1;
 }	
 /* client function that performs the leave method */
 int clientLeave(int sock)
@@ -392,6 +322,69 @@ song *compareSongDir(song *server, int serverLen, song *client, int clientLen, i
 		if(!minList)
 			fatal_error("malloc failed to create space for a song array\n");
 		memcpy(minList,maxList,numDiff*sizeof(song));
+
+		free(maxList);
+		return minList;
+	}
+	else
+	{
+		return maxList;
+	}
+}
+
+/* creates an array of songs that the server has but the client does not have, server and client arrays are not freed */
+Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clientLen, int *lenOfNewArr)
+{
+	int maxLen=(serverLen>clientLen)?serverLen:clientLen;
+	if (maxLen == 0) return 0;
+	Song **maxList=malloc(maxLen*sizeof(Song*));
+	if(!maxList)
+		fatal_error("malloc failed to create space for a song array\n");
+	
+	int s = 0;
+	int c = 0;	
+	char found = 0; /* 0 represents none are equal */
+	int numDiff = 0;
+
+	while(serverLen>s)
+	{
+		c=0;
+		found=0;
+		while(clientLen>c)
+		{
+			int i;
+
+			int equal = memcmp(server[s]->checksum.data,client[c]->checksum.data,server[s]->checksum.len);
+			
+			if(equal == 0)
+			{
+				found=1;
+			}
+			c++;
+		}
+		if(!found)
+		{
+			maxList[numDiff] = server[s];
+			//memcpy(maxList[numDiff],server[s],sizeof(server[s]));
+			numDiff++;
+		}
+		s++;
+	}
+
+	(*lenOfNewArr)=numDiff;
+	
+	if(!lenOfNewArr)
+	{
+		free(maxList);
+		return 0;
+	}
+
+	if(maxLen!=serverLen)
+	{
+		Song **minList = malloc(numDiff*sizeof(Song*));
+		if(!minList)
+			fatal_error("malloc failed to create space for a song array\n");
+		memcpy(minList,maxList,numDiff*sizeof(Song*));
 
 		free(maxList);
 		return minList;
@@ -897,7 +890,7 @@ int sendFile(FILE *file, int sock)
 	int numBytesToSend = fileLen(file);		/* total bytes that should be sent */
 	if(!numBytesToSend)
 		return 0;
-	int bufferSize = (SNDBUFSIZE<numBytesToSend)?SNDBUFSIZE:numBytesToSend;
+	int bufferSize = SNDBUFSIZE;
 
 
 	/* create send buffer */
@@ -920,9 +913,7 @@ int sendFile(FILE *file, int sock)
 	/* while the file has not been sent */
 	while(numBytesToSend>totalFileBytesSent) 
 	{ 
-
-		/* checks if bytes to be read in this iteration are greater than send buffer */
-		currNumBytesToRead=(numBytesToSend-bytesRead>bufferSize)?bufferSize:numBytesToSend-bytesRead;
+		currNumBytesToRead = bufferSize;
 		
  
 		/* read bytes */
@@ -942,6 +933,10 @@ int sendFile(FILE *file, int sock)
 		/* while the bytes that have been read are greater than the bytes that have been sent */
 		while(bytesSent < currBytesRead)
 		{
+			printf("curr bytes read: %d\n", currBytesRead);
+			printf("bytes sent: %d\n", bytesSent);
+			printf("numBytesToSend: %d\n", numBytesToSend);
+			printf("total sent: %d\n", totalFileBytesSent);
 			/* send maximum number of bytes */
 			currBytesSent= send(sock, &(sndBuf[bytesSent]), currBytesRead-bytesSent, 0);
 			if(currBytesSent<0)
@@ -951,8 +946,9 @@ int sendFile(FILE *file, int sock)
 		}
 		/* keep track of the total number of bytes that have been sent */
 		totalFileBytesSent += bytesSent;
-		
 	}
+
+	printf("done sending\n");
 
 	free(sndBuf);
 

@@ -132,9 +132,6 @@ void *ThreadMain(void *threadArgs)
 		Header *header= receiveHeaderProto(clientSock);
 		printf("received a header\n");
 		int method = header->method;
-		//int indexes = header->indexes;
-
-		free(header);
 		
 		if(method==HEADER__METHOD_TYPE__LIST) {
 			fprintf(stderr,"LIST\n");
@@ -192,6 +189,8 @@ void *ThreadMain(void *threadArgs)
 		} else {
 			fatal_error("method does not exist\n");
 		}
+
+		header__free_unpacked(header, 0);
 	}
 
 	free(ip);

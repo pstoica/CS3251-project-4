@@ -201,10 +201,10 @@ int clientPull(int sock)
 		
 }
 /* server function that performs the pull method */
-int serverPull(int sock,int indexes)
+int serverPull(int sock, Header *header)
 {	
 	int numSongs=numSongsInDir();
-	if(!indexes)//if the client has no songs
+	if(header->n_songs == 0)//if the client has no songs
 	{
 		if(!numSongs) //if the server has no songs
 		{
@@ -233,6 +233,7 @@ int serverPull(int sock,int indexes)
 	}
 	else //the client has songs
 	{
+		/*
 		if(!numSongs) //if the server has no songs
 		{
 			song *rcvSongs=recvSongArray(indexes,sock);
@@ -281,7 +282,7 @@ int serverPull(int sock,int indexes)
 			free(rcvSongs);
 			free(diffSongs);
 			free(serverSongs);
-		}
+		}*/
 	}
 	
 	return 1;	

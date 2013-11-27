@@ -158,8 +158,8 @@ void *ThreadMain(void *threadArgs)
 			if(!logFile(logStr,"PULL",ip,mutex,cond,&busy))
 				fatal_error("List log file failed\n");
 			
-			/*if(!serverPull(clientSock,indexes))
-				fatal_error("server pull failed\n"); */
+			if(!serverPull(clientSock, header))
+				fatal_error("server pull failed\n");
 		} else if(method==HEADER__METHOD_TYPE__LEAVE) {
 			fprintf(stderr,"LEAVE\n");
 		

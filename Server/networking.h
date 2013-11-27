@@ -49,7 +49,7 @@ int serverList(int sock);
 int clientDiff(int sock);
 int serverDiff(int sock);
 int clientPull(int sock);
-int serverPull(int sock,int indexes);
+int serverPull(int sock, Header *header);
 int clientLeave(int sock);
 int serverLeave(int sock);
 

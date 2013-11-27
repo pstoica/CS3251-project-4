@@ -32,7 +32,10 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.squareup.wire.ByteString;
 import com.squareup.wire.Wire;
 
 public class MainActivity extends Activity {
@@ -56,6 +59,30 @@ public class MainActivity extends Activity {
         textView = (TextView) findViewById(R.id.textView);
     }
 
+    protected List<Song> getSongs() {
+        String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
+        File dir = new File(path);
+        String file[] = dir.list();
+        //String songs[] = new String[file.length];
+        List<Song> songs = new ArrayList<Song>(file.length);
+        int song_cnt = 0;
+        if(file != null){
+            for(int i = 0; i < file.length; i++){
+                if(file[i].endsWith(".mp3")){
+                    File f = new File(path + file[i]);
+
+                    Song song = new Song.Builder()
+                            .title(file[i])
+                            .checksum(ByteString.of("0000"))
+                            .lenofsong((int) f.length())
+                            .build();
+
+                    Log.d("DIFF (local)", file[i]);
+                }
+            }
+        }
+    }
+
     public void doList(View view) {
         Header header = new Header.Builder()
                 .method(Header.MethodType.LIST)
@@ -73,7 +100,12 @@ public class MainActivity extends Activity {
     }
 
     public void doPull(View view) {
+        Header header = new Header.Builder()
+                .method(Header.MethodType.DIFF)
+                .songs(getSongs())
+                .build();
 
+        new NetworkingTask().execute(header);
     }
 
     public void doLeave(View view) {
@@ -263,7 +295,13 @@ public class MainActivity extends Activity {
         }
 
         protected String doPull(Header header) {
-            return "pull\n";
+            sendHeader(header);
+
+            Header response = receiveHeader();
+
+            String result = "PULL result:\n";
+
+            return result;
         }
 
         protected String doLeave(Header header) {

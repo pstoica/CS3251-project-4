@@ -942,10 +942,12 @@ int sendFile(FILE *file, int sock)
 				
 			bytesSent+=currBytesSent;
 
+			/*
 			printf("curr bytes read: %d\n", currBytesRead);
 			printf("bytes sent: %d\n", bytesSent);
 			printf("numBytesToSend: %d\n", numBytesToSend);
 			printf("total sent: %d\n", totalFileBytesSent);
+			*/
 		}
 		/* keep track of the total number of bytes that have been sent */
 		totalFileBytesSent += bytesSent;

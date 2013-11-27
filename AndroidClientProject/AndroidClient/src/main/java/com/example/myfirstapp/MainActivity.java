@@ -289,16 +289,16 @@ public class MainActivity extends Activity {
             Log.d("RECV", "Bytes to receive: "+numBytesToRecv+"\n");
 
             try {
-                File file = new File(path + song.title);
+                File file = new File(path, song.title);
                 file.setWritable(true);
-                FileOutputStream stream = new FileOutputStream(path + song.title);
+                FileOutputStream stream = new FileOutputStream(file);
 
                 int totalRead = 0;
                 int bytesRead = 0;
                 int bytesToRead = 0;
 
                 while (totalRead < numBytesToRecv) {
-                    bytesToRead = Math.min(bufferLength, numBytesToRecv - bufferLength);
+                    bytesToRead = Math.min(bufferLength, numBytesToRecv - totalRead);
                     bytesRead = input.read(buffer, 0, bytesToRead);
                     stream.write(buffer, 0, bytesRead);
                     totalRead += bytesRead;
@@ -363,8 +363,12 @@ public class MainActivity extends Activity {
 
             List<Song> diffSongs = compareSongs(response.songs);
 
-            for (Song song: diffSongs) {
-                result += song.title + "\n";
+            if (diffSongs.isEmpty()) {
+                result += "No different files found.\n";
+            } else {
+                for (Song song: diffSongs) {
+                    result += song.title + "\n";
+                }
             }
 
             return result;
@@ -377,10 +381,13 @@ public class MainActivity extends Activity {
 
             String result = "PULL result:\n";
 
-            for (Song song : response.songs) {
-                receiveFile(song);
-                System.out.println("finished download: " + song.title);
-                result += "Received: " + song.title + "\n";
+            if (response.songs == null || response.songs.isEmpty()) {
+                result += "No files pulled.\n";
+            } else {
+                for (Song song : response.songs) {
+                    receiveFile(song);
+                    result += "Received: " + song.title + "\n";
+                }
             }
 
             return result;

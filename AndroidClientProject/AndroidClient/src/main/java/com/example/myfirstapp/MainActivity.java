@@ -45,7 +45,7 @@ import com.squareup.wire.ByteString;
 import com.squareup.wire.Wire;
 
 public class MainActivity extends Activity {
-    public static final String SERVERIP = "10.0.2.2"; //your computer IP address should be written here
+    public static final String SERVERIP = "192.168.56.101"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
     public static final String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
     private TextView textView;
@@ -281,8 +281,10 @@ public class MainActivity extends Activity {
         }
 
         public void receiveFile(Song song){
+            Log.d("RECV", "Starting receiveFile()\n");
             int numBytesToRecv = song.lenofsong;
             byte data[] = new byte[numBytesToRecv];
+            Log.d("RECV", "Bytes to receive: "+numBytesToRecv+"\n");
 
             try {
                 input.read(data, 0, numBytesToRecv);

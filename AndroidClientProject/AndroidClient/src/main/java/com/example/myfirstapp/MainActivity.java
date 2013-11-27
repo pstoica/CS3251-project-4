@@ -27,6 +27,8 @@ import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -45,6 +47,7 @@ import com.squareup.wire.Wire;
 public class MainActivity extends Activity {
     public static final String SERVERIP = "192.168.56.101"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
+    public static final String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
     private TextView textView;
     private boolean isConnected = false;
 
@@ -258,6 +261,36 @@ public class MainActivity extends Activity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+
+        public void receiveFile(Song song){
+            int numBytesToRecv = song.lenofsong;
+            byte data[] = new byte[numBytesToRecv];
+
+            try {
+                input.read(data, 0, numBytesToRecv);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            File file = new File(path + song.title);
+            if(!file.exists()){
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            // just to be safe
+            file.setWritable(true);
+
+            try {
+                FileOutputStream stream = new FileOutputStream(path + song.title);
+                stream.write(data);
+                stream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 

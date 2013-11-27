@@ -93,7 +93,6 @@ public class MainActivity extends Activity {
     }
 
     protected List<Song> getSongs() {
-        String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
         File dir = new File(path);
         String file[] = dir.list();
 
@@ -283,7 +282,7 @@ public class MainActivity extends Activity {
 
         public void receiveFile(Song song){
             Log.d("RECV", "Starting receiveFile()\n");
-            int bufferLength = 512;
+            int bufferLength = 4096;
             int numBytesToRecv = song.lenofsong;
             byte[] buffer = new byte[bufferLength];
             Log.d("RECV", "Bytes to receive: "+numBytesToRecv+"\n");

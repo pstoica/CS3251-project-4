@@ -211,6 +211,7 @@ int serverPull(int sock, Header *header)
 	
 	int i;
 	for (i = 0; i < diffSongCount; i++) {
+		printf("opening: %s\n", diffSongs[i]->title);
 		FILE *file = fopen(diffSongs[i]->title,"r+");
 		if(!sendFile(file, sock))
 			fatal_error("receive file failed\n");

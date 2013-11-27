@@ -27,21 +27,27 @@ import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import com.squareup.wire.ByteString;
 import com.squareup.wire.Wire;
 
 public class MainActivity extends Activity {
     public static final String SERVERIP = "192.168.56.101"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
+    public static final String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
     private TextView textView;
     private boolean isConnected = false;
 
@@ -58,6 +64,87 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutResourceId());
         textView = (TextView) findViewById(R.id.textView);
+    }
+
+    protected ByteString getChecksum(File f) {
+        MessageDigest md = null;
+        DigestInputStream dis;
+        byte[] buffer = new byte[2048];
+
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+            dis = new DigestInputStream(new FileInputStream(f), md);
+            while(dis.read(buffer) != -1);
+            dis.close();
+            return ByteString.of(md.digest());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    protected String byteArrayToHex(byte[] a) {
+        StringBuilder sb = new StringBuilder();
+        for(byte b: a)
+            sb.append(String.format("%02x", b&0xff));
+        return sb.toString();
+    }
+
+    protected List<Song> getSongs() {
+        String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
+        File dir = new File(path);
+        String file[] = dir.list();
+
+        if (file != null) {
+            List<Song> songs = new ArrayList<Song>(file.length);
+            if(file != null){
+                for(int i = 0; i < file.length; i++){
+                    if(file[i].endsWith(".mp3")){
+                        File f = new File(path + file[i]);
+
+                        Song song = new Song.Builder()
+                            .title(file[i])
+                            .checksum(getChecksum(f))
+                            .lenofsong((int) f.length())
+                            .build();
+
+                        songs.add(song);
+
+                        Log.d("DIFF (local)", file[i]);
+                    }
+                }
+            }
+
+            return songs;
+        }
+
+        return null;
+    }
+
+    public List<Song> compareSongs(List<Song> serverSongs) {
+        String result = "";
+        List<Song> clientSongs = getSongs();
+        List<Song> diffSongs = new ArrayList<Song>();
+
+        if (serverSongs != null) {
+            int numMatched = 0;
+            for (Song serverSong: serverSongs) {
+                boolean found = false;
+
+                for (Song clientSong: clientSongs) {
+                    if (clientSong.checksum.equals(serverSong.checksum)) {
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    diffSongs.add(serverSong);
+                }
+            }
+        }
+
+        return diffSongs;
     }
 
     public void doList(View view) {
@@ -77,7 +164,12 @@ public class MainActivity extends Activity {
     }
 
     public void doPull(View view) {
+        Header header = new Header.Builder()
+                .method(Header.MethodType.DIFF)
+                .songs(getSongs())
+                .build();
 
+        //new NetworkingTask().execute(header);
     }
 
     public void doLeave(View view) {
@@ -86,9 +178,6 @@ public class MainActivity extends Activity {
                 .build();
 
         new NetworkingTask().execute(header);
-
-        MainActivity.this.finish();
-        System.exit(0);
     }
 
     public void doCap(View view) {
@@ -175,6 +264,36 @@ public class MainActivity extends Activity {
             }
         }
 
+        public void receiveFile(Song song){
+            int numBytesToRecv = song.lenofsong;
+            byte data[] = new byte[numBytesToRecv];
+
+            try {
+                input.read(data, 0, numBytesToRecv);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            File file = new File(path + song.title);
+            if(!file.exists()){
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            // just to be safe
+            file.setWritable(true);
+
+            try {
+                FileOutputStream stream = new FileOutputStream(path + song.title);
+                stream.write(data);
+                stream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         public void sendHeader(Header header) {
             Log.d("TCP", "Sending header...");
             byte[] data = header.toByteArray();
@@ -220,98 +339,36 @@ public class MainActivity extends Activity {
         }
 
         protected String doDiff(Header header) {
-            //return "diff\n";
             sendHeader(header);
 
             Header response = receiveHeader();
 
-            String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
-            File dir = new File(path);
-            String file[] = dir.list();
-            String songs[] = new String[file.length];
-            byte checksums[][] = new byte[file.length][4096];
-            int song_cnt = 0;
-            if(file != null){
-                for(int i = 0; i < file.length; i++){
-                    if(file[i].endsWith(".mp3")){
-                        songs[song_cnt] = file[i];
-
-                        try {
-                            MessageDigest md = MessageDigest.getInstance("SHA-256");
-                            DigestInputStream dis = new DigestInputStream(new FileInputStream(new File(path + file[i])), md);
-                            while(dis.read(checksums[i]) != -1);
-                            dis.close();
-                            checksums[i] = md.digest();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        String msg = "-\nName : " + file[i] + "\n Checksum: ";
-                        StringBuilder sb = new StringBuilder();
-                        for(int k = 0; k < checksums[i].length; k++){
-                            sb.append(String.format("%x", checksums[i][k]));
-                        }
-                        Log.d("DIFF (local)", msg + sb.toString());
-                        song_cnt++;
-                    }
-                }
-            }
-
             String result = "DIFF result:\n";
-            //System.out.println(response.songs);
-            //Log.d("DIFF (remote)", response.songs + "");
 
-            int matchMap[] = new int[response.songs.size()];
+            List<Song> diffSongs = compareSongs(response.songs);
 
-            if (response.songs != null) {
-                int num_matched = 0;
-                int j = 0;
-                for (Song song: response.songs) {
-                    boolean found = false;
-                    byte rmcks[] = song.toByteArray();
-                    String msg1 = "-\n Name: " + song.title + "\n Checksum: ";
-                    for(int k = 0; k < rmcks.length; k++){
-                        msg1 = String.format(msg1 + "%x", rmcks[k]);
-                    }
-                    Log.d("DIFF (remote)", msg1);
-
-                    for (int i = 0; i < song_cnt && !found; i++){
-                        if(song.title.equals(songs[i])){
-                            found = true;
-                            matchMap[j] = i;
-                            num_matched++;
-                        }
-                    }
-                    if(!found){
-                        result += song.title + "\n";
-                        matchMap[j] = -1;
-                    }
-                    j++;
-                }
-
-                /* checksum check
-                if(num_matched < response.songs.size()){
-                    // compare unmatched songs to local song checksums
-                    // matchMap[song_index(res)] = local_song_index (or -1 if not matched)
-                    for(int i = 0; i < matchMap.length && num_matched < response.songs.size(); i++){
-                        if(matchMap[i] == -1){
-
-                        }
-                    }
-                }*/
-            } else {
-                result += "No songs found.\n";
+            for (Song song: diffSongs) {
+                result += song.title + "\n";
             }
 
             return result;
         }
 
         protected String doPull(Header header) {
-            return "pull\n";
+            sendHeader(header);
+
+            Header response = receiveHeader();
+
+            String result = "PULL result:\n";
+
+            return result;
         }
 
         protected String doLeave(Header header) {
             sendHeader(header);
+
+            MainActivity.this.finish();
+            System.exit(0);
             return "LEAVE\n";
         }
 

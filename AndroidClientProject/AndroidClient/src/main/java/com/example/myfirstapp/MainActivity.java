@@ -181,13 +181,28 @@ public class MainActivity extends Activity {
     }
 
     public void doCap(View view) {
+        EditText box = (EditText) findViewById(R.id.cap_value);
+        String cap_str = box.getText().toString();
+        int cap_val;
+
+        try {
+            cap_val = Integer.parseInt(cap_str);
+        } catch (NumberFormatException e){
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Enter numbers only!", Toast.LENGTH_LONG);
+            box.setText("");
+            return;
+        }
+
         // use .limit to add the cap limit to the header
         Header header = new Header.Builder()
                 .method(Header.MethodType.CAP)
-                .limit(5)
+                .limit(cap_val)
                 .build();
 
         new NetworkingTask().execute(header);
+
+        box.setText("");
     }
 
     @Override
@@ -373,7 +388,10 @@ public class MainActivity extends Activity {
         }
 
         protected String doCap(Header header) {
-            return "cap\n";
+            sendHeader(header);
+            Header response = receiveHeader();
+            String result = "CAP " + header.limit + " MB\n";
+            return result;
         }
 
         protected String doInBackground(Header... headers) {

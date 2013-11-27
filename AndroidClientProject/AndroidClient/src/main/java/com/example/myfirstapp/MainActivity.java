@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.Message;
 import android.text.method.ScrollingMovementMethod;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -34,7 +36,7 @@ import java.nio.ByteBuffer;
 import com.squareup.wire.Wire;
 
 public class MainActivity extends Activity {
-    public static final String SERVERIP = "10.0.2.2"; //your computer IP address should be written here
+    public static final String SERVERIP = "192.168.56.101"; //your computer IP address should be written here
     public static final int SERVERPORT = 2001;
     private TextView textView;
     private boolean isConnected = false;
@@ -64,7 +66,7 @@ public class MainActivity extends Activity {
 
     public void doDiff(View view) {
         Header header = new Header.Builder()
-                .method(Header.MethodType.LIST)
+                .method(Header.MethodType.DIFF)
                 .build();
 
         new NetworkingTask().execute(header);
@@ -203,7 +205,7 @@ public class MainActivity extends Activity {
 
             if (response.songs != null) {
                 for (Song song: response.songs) {
-                    result += song.title + "\n";
+                    result += song.title + " -- " + song.checksum + " -- " + song.lenofsong + "\n";
                 }
             } else {
                 result += "No songs found.\n";
@@ -213,7 +215,51 @@ public class MainActivity extends Activity {
         }
 
         protected String doDiff(Header header) {
-            return "diff\n";
+            //return "diff\n";
+            sendHeader(header);
+
+            Header response = receiveHeader();
+
+            String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
+            File dir = new File(path);
+            String file[] = dir.list();
+            String songs[] = new String[file.length];
+            int song_cnt = 0;
+            if(file != null){
+                for(int i = 0; i < file.length; i++){
+                    if(file[i].endsWith(".mp3")){
+                        songs[song_cnt] = file[i];
+                        Log.d("DIFF (local)", file[i]);
+                        song_cnt++;
+                    }
+                }
+            }
+
+            String result = "DIFF result (no checksum check):\n";
+            System.out.println(response.songs);
+            Log.d("DIFF (remote)", response.songs + "");
+
+            if (response.songs != null) {
+                int num_matched = 0;
+                for (Song song: response.songs) {
+                    boolean found = false;
+                    for (int i = 0; i < song_cnt && !found; i++){
+                        if(song.title.equals(songs[i])){
+                            found = true;
+                        }
+                    }
+                    if(!found){
+                        result += song.title + "\n";
+                    }
+                }
+                if(num_matched == 0){
+                    result += "No songs found.\n";
+                }
+            } else {
+                result += "No songs found.\n";
+            }
+
+            return result;
         }
 
         protected String doPull(Header header) {

@@ -130,27 +130,16 @@ int clientDiff(int sock)
 int serverDiff(int sock)
 {
 	int numSongs=numSongsInDir();
-
 	if(!numSongs)
 	{
-		if(!sendHeader(1,0,0,sock))
+		if(!sendHeader(0,0,0,sock))
 			fatal_error("send header has failed\n");
 		return 1;
 	}
 
-	if(!sendHeader(1,numSongsInDir()*sizeof(song), numSongs, sock))
+	if(!sendHeaderProto(0, createSongArrayProto(numSongs), numSongs, sock))
 		fatal_error("send header has failed\n");
-		
-	song *songs=createSongArray(numSongs);
-	if(!songs)
-		fatal_error("creating song array failed\n");
-		
-	if(sendSongArray(songs,numSongs,sock)!=sizeof(song)*numSongs)
-		fatal_error("sending song array failed\n"); 	
 	
-	//printf("%s -- %x -- %i\n", songs[0].title, songs[0].checksum, songs[0].lenOfSong);
-	
-	free((void*)songs);
 	return 1;
 }
 

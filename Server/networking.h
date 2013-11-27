@@ -42,6 +42,7 @@ typedef struct {
 typedef struct {
 	int clientSock;	/*Socket descripter for client*/
 	char *ip;
+	int32_t cap;
 }ThreadArgs;
 
 int clientList(int sock);
@@ -52,6 +53,7 @@ int clientPull(int sock);
 int serverPull(int sock,int indexes);
 int clientLeave(int sock);
 int serverLeave(int sock);
+int serverCap(int sock);
 
 int fileLen(FILE *file);
 

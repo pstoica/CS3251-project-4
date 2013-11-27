@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
 			fatal_error("malloc() failed\n");
 		threadArgs->clientSock = clientSock;
 		threadArgs->ip=inet_ntoa(changeClntAddr.sin_addr);
+		threadArgs->cap = -1;
 		
 		/* Create client thread */
 		pthread_t threadID;
@@ -171,6 +172,23 @@ void *ThreadMain(void *threadArgs)
 				fatal_error("server leave failed\n"); 
 				
 			left = true;
+		} else if(method==HEADER__METHOD_TYPE__CAP) {
+			char *msg;
+			asprintf(&msg, "CAP %i\n", header->limit);
+			fprintf(stderr,msg);
+			free(msg);
+			
+			asprintf(&msg, "CAP %i", header->limit);
+		
+			if(!logFile(logStr,msg,ip,mutex,cond,&busy))
+				fatal_error("List log file failed\n");
+			free(msg);
+
+			((ThreadArgs*)threadArgs)->cap = header->limit;
+
+			if(!serverCap(clientSock))
+				fatal_error("server cap failed\n"); 
+				
 		} else {
 			fatal_error("method does not exist\n");
 		}

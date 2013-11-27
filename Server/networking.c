@@ -311,6 +311,13 @@ int serverLeave(int sock)
 	return 1;
 }
 
+int serverCap(int sock){
+	if(!sendHeader(4, 0, 0, sock))
+		fatal_error("send header has failed\n");
+		
+	return 1;
+}
+
 /* returns length of file */
 int fileLen(FILE *file)
 {

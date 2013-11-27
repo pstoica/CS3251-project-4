@@ -26,6 +26,7 @@ import android.widget.Toast;
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -34,6 +35,9 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import com.squareup.wire.ByteString;
 import com.squareup.wire.Wire;
@@ -59,28 +63,85 @@ public class MainActivity extends Activity {
         textView = (TextView) findViewById(R.id.textView);
     }
 
+    protected ByteString getChecksum(File f) {
+        MessageDigest md = null;
+        DigestInputStream dis;
+        byte[] buffer = new byte[2048];
+
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+            dis = new DigestInputStream(new FileInputStream(f), md);
+            while(dis.read(buffer) != -1);
+            dis.close();
+            return ByteString.of(md.digest());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    protected String byteArrayToHex(byte[] a) {
+        StringBuilder sb = new StringBuilder();
+        for(byte b: a)
+            sb.append(String.format("%02x", b&0xff));
+        return sb.toString();
+    }
+
     protected List<Song> getSongs() {
         String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
         File dir = new File(path);
         String file[] = dir.list();
-        //String songs[] = new String[file.length];
-        List<Song> songs = new ArrayList<Song>(file.length);
-        int song_cnt = 0;
-        if(file != null){
-            for(int i = 0; i < file.length; i++){
-                if(file[i].endsWith(".mp3")){
-                    File f = new File(path + file[i]);
 
-                    Song song = new Song.Builder()
+        if (file != null) {
+            List<Song> songs = new ArrayList<Song>(file.length);
+            if(file != null){
+                for(int i = 0; i < file.length; i++){
+                    if(file[i].endsWith(".mp3")){
+                        File f = new File(path + file[i]);
+
+                        Song song = new Song.Builder()
                             .title(file[i])
-                            .checksum(ByteString.of("0000"))
+                            .checksum(getChecksum(f))
                             .lenofsong((int) f.length())
                             .build();
 
-                    Log.d("DIFF (local)", file[i]);
+                        songs.add(song);
+
+                        Log.d("DIFF (local)", file[i]);
+                    }
+                }
+            }
+
+            return songs;
+        }
+
+        return null;
+    }
+
+    public List<Song> compareSongs(List<Song> serverSongs) {
+        String result = "";
+        List<Song> clientSongs = getSongs();
+        List<Song> diffSongs = new ArrayList<Song>();
+
+        if (serverSongs != null) {
+            int numMatched = 0;
+            for (Song serverSong: serverSongs) {
+                boolean found = false;
+
+                for (Song clientSong: clientSongs) {
+                    if (clientSong.checksum.equals(serverSong.checksum)) {
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    diffSongs.add(serverSong);
                 }
             }
         }
+
+        return diffSongs;
     }
 
     public void doList(View view) {
@@ -105,7 +166,7 @@ public class MainActivity extends Activity {
                 .songs(getSongs())
                 .build();
 
-        new NetworkingTask().execute(header);
+        //new NetworkingTask().execute(header);
     }
 
     public void doLeave(View view) {
@@ -114,8 +175,6 @@ public class MainActivity extends Activity {
                 .build();
 
         new NetworkingTask().execute(header);
-
-        MainActivity.this.finish();
     }
 
     public void doCap(View view) {
@@ -237,7 +296,7 @@ public class MainActivity extends Activity {
 
             if (response.songs != null) {
                 for (Song song: response.songs) {
-                    result += song.title + " -- " + song.checksum + " -- " + song.lenofsong + "\n";
+                    result += song.title + "\n";
                 }
             } else {
                 result += "No songs found.\n";
@@ -247,48 +306,16 @@ public class MainActivity extends Activity {
         }
 
         protected String doDiff(Header header) {
-            //return "diff\n";
             sendHeader(header);
 
             Header response = receiveHeader();
 
-            String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
-            File dir = new File(path);
-            String file[] = dir.list();
-            String songs[] = new String[file.length];
-            int song_cnt = 0;
-            if(file != null){
-                for(int i = 0; i < file.length; i++){
-                    if(file[i].endsWith(".mp3")){
-                        songs[song_cnt] = file[i];
-                        Log.d("DIFF (local)", file[i]);
-                        song_cnt++;
-                    }
-                }
-            }
+            String result = "DIFF result:\n";
 
-            String result = "DIFF result (no checksum check):\n";
-            System.out.println(response.songs);
-            Log.d("DIFF (remote)", response.songs + "");
+            List<Song> diffSongs = compareSongs(response.songs);
 
-            if (response.songs != null) {
-                int num_matched = 0;
-                for (Song song: response.songs) {
-                    boolean found = false;
-                    for (int i = 0; i < song_cnt && !found; i++){
-                        if(song.title.equals(songs[i])){
-                            found = true;
-                        }
-                    }
-                    if(!found){
-                        result += song.title + "\n";
-                    }
-                }
-                if(num_matched == 0){
-                    result += "No songs found.\n";
-                }
-            } else {
-                result += "No songs found.\n";
+            for (Song song: diffSongs) {
+                result += song.title + "\n";
             }
 
             return result;
@@ -306,6 +333,9 @@ public class MainActivity extends Activity {
 
         protected String doLeave(Header header) {
             sendHeader(header);
+
+            MainActivity.this.finish();
+            System.exit(0);
             return "LEAVE\n";
         }
 

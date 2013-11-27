@@ -169,9 +169,8 @@ void *ThreadMain(void *threadArgs)
 
 			if(!serverLeave(clientSock))
 				fatal_error("server leave failed\n"); 
-			
+				
 			left = true;
-			break;
 		} else {
 			fatal_error("method does not exist\n");
 		}

@@ -40,7 +40,7 @@ int clientList(int sock)
 
 /* sever function that performs the list method */
 int serverList(int sock)  
-{
+{	
 	int numSongs=numSongsInDir();
 	if(!numSongs)
 	{
@@ -48,6 +48,7 @@ int serverList(int sock)
 			fatal_error("send header has failed\n");
 		return 1;
 	}
+
 	if(!sendHeaderProto(0, createSongArrayProto(numSongs), numSongs, sock))
 		fatal_error("send header has failed\n");
 	
@@ -146,6 +147,8 @@ int serverDiff(int sock)
 		
 	if(sendSongArray(songs,numSongs,sock)!=sizeof(song)*numSongs)
 		fatal_error("sending song array failed\n"); 	
+	
+	//printf("%s -- %x -- %i\n", songs[0].title, songs[0].checksum, songs[0].lenOfSong);
 	
 	free((void*)songs);
 	return 1;
@@ -441,7 +444,7 @@ int calculateChecksum(FILE *file,song *s)
     mdctx = EVP_MD_CTX_create();
     EVP_DigestInit_ex(mdctx, md, NULL);
 	
-	int bufferSize = 500000;
+	int bufferSize = 4096;
 
 	char *buff = malloc(bufferSize);
 	if(!buff)
@@ -492,7 +495,7 @@ int calculateChecksumProto(FILE *file, Song *s)
     mdctx = EVP_MD_CTX_create();
     EVP_DigestInit_ex(mdctx, md, NULL);
 	
-	int bufferSize = 500000;
+	int bufferSize = 4096;
 
 	char *buff = malloc(bufferSize);
 	if(!buff)
@@ -617,7 +620,7 @@ Song **createSongArrayProto(int numSongs) {
 				songs[i]->title = xstrdup(name);
 				songs[i]->lenofsong = fileLen(file);
 				calculateChecksumProto(file, songs[i]);
-	
+				
 				fclose(file);
 			
 				i++;
@@ -732,6 +735,7 @@ int sendHeader(int method,int numBytesToSend,int index, int sock)
 }
 
 int sendHeaderProto(int method, Song **songs, int numSongs, int sock) {
+	fflush(stdout);
 	Header header = HEADER__INIT;
 	unsigned len;
 	void *buf;
@@ -739,7 +743,7 @@ int sendHeaderProto(int method, Song **songs, int numSongs, int sock) {
 	header.method = method;
 	header.n_songs = numSongs;
 	header.songs = songs;
-
+	
 	len = header__get_packed_size(&header);
 	buf = malloc(len);
 	header__pack(&header, buf);

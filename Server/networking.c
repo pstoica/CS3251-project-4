@@ -208,11 +208,13 @@ int serverPull(int sock, Header *header)
 	Song **diffSongs = compareSongDirProto(createSongArrayProto(numSongs), numSongs, header->songs, header->n_songs, &diffSongCount);
 
 	sendHeaderProto(HEADER__METHOD_TYPE__PULL, diffSongs, diffSongCount, sock);
-
-	for (int i = 0; i < diffSongCount; i++) {
+	
+	int i;
+	for (i = 0; i < diffSongCount; i++) {
 		FILE *file = fopen(diffSongs[i]->title,"r+");
 		if(!sendFile(file, sock))
 			fatal_error("receive file failed\n");
+		fclose(file);
 	}
 	
 	return 1;

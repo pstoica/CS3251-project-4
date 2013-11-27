@@ -122,11 +122,11 @@ void parseXML(char *file_name){
 					bool line_matched = false;
 					char *start;
 					char *end;
-					for(i = 0; i < 5 && !line_matched; i++){
+					for(i = 1; i < 4 && !line_matched; i++){
 						// get Name, Size, Play Count & Location
 							// Name, Size, or Location (file://<file_path>/<file_name>) to ID song/file?
 						switch(i){
-							case 0: start = "<key>Name</key><string>"; end = "</string>"; break;
+							//case 0: start = "<key>Name</key><string>"; end = "</string>"; break;
 							case 1: start = "<key>Size</key><integer>"; end = "</integer>"; break;
 							case 2: start = "<key>Play Count</key><integer>"; end = "</integer>"; break;
 							case 3: start = "<key>Location</key><string>"; end = "</string>"; break;
@@ -161,9 +161,6 @@ void parseXML(char *file_name){
 									track_list[track_count].file_name = (char *) malloc(sizeof(title));
 									track_list[track_count].file_name = title;
 									title = NULL;
-								} else {
-									track_list[track_count].name = (char *) malloc(sizeof(val));
-									track_list[track_count].name = val;
 								}
 							}
 							

@@ -935,16 +935,17 @@ int sendFile(FILE *file, int sock)
 		/* while the bytes that have been read are greater than the bytes that have been sent */
 		while(bytesSent < currBytesRead)
 		{
-			printf("curr bytes read: %d\n", currBytesRead);
-			printf("bytes sent: %d\n", bytesSent);
-			printf("numBytesToSend: %d\n", numBytesToSend);
-			printf("total sent: %d\n", totalFileBytesSent);
 			/* send maximum number of bytes */
 			currBytesSent= send(sock, &(sndBuf[bytesSent]), currBytesRead-bytesSent, 0);
 			if(currBytesSent<0)
 				fatal_error("send failed");
 				
 			bytesSent+=currBytesSent;
+
+			printf("curr bytes read: %d\n", currBytesRead);
+			printf("bytes sent: %d\n", bytesSent);
+			printf("numBytesToSend: %d\n", numBytesToSend);
+			printf("total sent: %d\n", totalFileBytesSent);
 		}
 		/* keep track of the total number of bytes that have been sent */
 		totalFileBytesSent += bytesSent;

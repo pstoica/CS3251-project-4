@@ -45,7 +45,8 @@ import com.squareup.wire.ByteString;
 import com.squareup.wire.Wire;
 
 public class MainActivity extends Activity {
-    public static final String SERVERIP = "192.168.56.101"; //your computer IP address should be written here
+    //public static final String SERVERIP = "192.168.56.101"; //your computer IP address should be written here
+    public static final String SERVERIP = "10.0.2.2";
     public static final int SERVERPORT = 2001;
     public static final String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
     private TextView textView;
@@ -282,30 +283,27 @@ public class MainActivity extends Activity {
 
         public void receiveFile(Song song){
             Log.d("RECV", "Starting receiveFile()\n");
+            int bufferLength = 512;
             int numBytesToRecv = song.lenofsong;
-            byte data[] = new byte[numBytesToRecv];
+            byte[] buffer = new byte[bufferLength];
             Log.d("RECV", "Bytes to receive: "+numBytesToRecv+"\n");
 
             try {
-                input.read(data, 0, numBytesToRecv);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            File file = new File(path + song.title);
-            if(!file.exists()){
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            // just to be safe
-            file.setWritable(true);
-
-            try {
+                File file = new File(path + song.title);
+                file.setWritable(true);
                 FileOutputStream stream = new FileOutputStream(path + song.title);
-                stream.write(data);
+
+                int totalRead = 0;
+                int bytesRead = 0;
+                int bytesToRead = 0;
+
+                while (totalRead < numBytesToRecv) {
+                    bytesToRead = Math.min(bufferLength, numBytesToRecv - bufferLength);
+                    bytesRead = input.read(buffer, 0, bytesToRead);
+                    stream.write(buffer, 0, bytesRead);
+                    totalRead += bytesRead;
+                }
+
                 stream.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -381,6 +379,7 @@ public class MainActivity extends Activity {
 
             for (Song song : response.songs) {
                 receiveFile(song);
+                System.out.println("finished download: " + song.title);
                 result += "Received: " + song.title + "\n";
             }
 

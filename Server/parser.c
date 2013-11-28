@@ -6,7 +6,7 @@
 
 #define BUFSIZE 10
 
-track *track_list;
+track track_list[12];
 int track_count, i, j;
 
 /**
@@ -36,11 +36,13 @@ void parseXML(char *file_name){
     size_t val_len;
     int start_len, end_len;
     char val[256];
-    track_list = (track *)malloc(12*sizeof(track));
+    //track_list = (track *)malloc(12*sizeof(track));
     
     // Read the file while there are still unseen track entries
     //  or until file runs out of lines
     while((read = getline(&line, &len, file) != -1)){
+    	printf("%i \n", track_count);
+    	fflush(stdout);
     	// Handle any leading spaces
     	const char* firstNonSpace = line;
     	int spaces = 0;

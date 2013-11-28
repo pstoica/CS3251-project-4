@@ -287,8 +287,12 @@ void orderSongs(Song **diffSongs, int diffSongCount){
 	
 	printf("ordered_list now in popularity order...\n");
 	
+	for(i = 0; i < diffSongCount; i++){
+		printf("Track %i : %s -- %u \n", i, ordered_diff[i]->title, ordered_diff[i]->lenofsong);
+	}
+	
 	memcpy(diffSongs, ordered_diff, sizeof(Song *) * diffSongCount);
-	free(ordered_diff);
+	ordered_diff = NULL;
 }
 
 /* returns length of file */

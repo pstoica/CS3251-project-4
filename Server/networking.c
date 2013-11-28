@@ -212,9 +212,18 @@ int serverPull(int sock, Header *header, ThreadArgs *settings)
 	if(settings->cap != -1){
 		orderSongs(diffSongs, diffSongCount);
 
-		/*for(i = 0; i < diffSongCount; i++){
-			printf("Track %i : %s -- %u \n", i, diffSongs[i]->title, diffSongs[i]->lenofsong);
-		}*/
+		for(i = 0; i < diffSongCount; i++){
+			printf("Popular Track %i : %s -- %u \n", i, diffSongs[i]->title, diffSongs[i]->lenofsong);
+
+			if(diffSongs[i]->lenofsong > settings->cap && settings->cap > -1){
+				diffSongs[i]->has_caplimitskip = true;
+				diffSongs[i]->caplimitskip = true;
+			} else {
+				diffSongs[i]->has_caplimitskip = false;
+				if(settings->cap != -1)
+					settings->cap = settings->cap - diffSongs[i]->lenofsong;
+			}
+		}
 	}
 
 	sendHeaderProto(HEADER__METHOD_TYPE__PULL, diffSongs, diffSongCount, sock);
@@ -424,15 +433,6 @@ Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clie
 		if(!found)
 		{	
 			maxList[numDiff] = server[s];
-			/* Add CAP check here */
-			if(maxList[numDiff]->lenofsong > settings->cap && settings->cap > -1){
-				maxList[numDiff]->has_caplimitskip = true;
-				maxList[numDiff]->caplimitskip = true;
-			} else {
-				maxList[numDiff]->has_caplimitskip = false;
-				if(settings->cap != -1)
-					settings->cap = settings->cap - maxList[numDiff]->lenofsong;
-			}
 			numDiff++;
 		}
 		s++;

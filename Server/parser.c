@@ -53,7 +53,7 @@ void parseXML(char *file_name, track *track_list){
 		
 		reti = regcomp(&regex, "<key>Size</key><integer>", 0); 
 		reti = regexec(&regex, line, 0, NULL, 0);
-		//regfree(&regex);
+		regfree(&regex);
 		if(!reti){
 			// get the size
 			start_len = strlen("<key>Size</key><integer>");
@@ -68,7 +68,7 @@ void parseXML(char *file_name, track *track_list){
 			
 			reti = regcomp(&regex, "<key>Play Count</key><integer>", 0);
 			reti = regexec(&regex, line, 0, NULL, 0);
-			//regfree(&regex);
+			regfree(&regex);
 			if(!reti){
 				// get the play count
 				start_len = strlen("<key>Play Count</key><integer>");
@@ -83,7 +83,7 @@ void parseXML(char *file_name, track *track_list){
 		
 				reti = regcomp(&regex, "<key>Location</key><string>", 0); 
 				reti = regexec(&regex, line, 0, NULL, 0);
-				//regfree(&regex);
+				regfree(&regex);
 				if(!reti){
 					// get the location
 					start_len = strlen("<key>Location</key><string>");
@@ -97,7 +97,7 @@ void parseXML(char *file_name, track *track_list){
 
 					int new_string_len = 0;
 					int old_string_len = strlen(temp);
-					for (int i = 0; i < old_string_len; i++) {
+					for (i = 0; i < old_string_len; i++) {
 						if ((i + 2) < old_string_len && temp[i] == '%' && temp[i + 1] == '2' && temp[i + 2] == '0') {
 							title[new_string_len] = ' ';
 							i += 2;
@@ -122,8 +122,10 @@ void parseXML(char *file_name, track *track_list){
 
 track *getOrderedTrackList(int numSongs, track *track_list){
 	int i, j;
-
+	
+	//printf("start parse\n");
 	parseXML("iTunes Library.xml", track_list);
+	//printf("finish parse\n");
 
 	track unordered_list[numSongs];
 	//memcpy(&unordered_list, &track_list, sizeof(track_list));
@@ -132,7 +134,8 @@ track *getOrderedTrackList(int numSongs, track *track_list){
 	}
 	//memset(track_list, 0, sizeof(track)*track_count);
 	int next = 0;
-
+	
+	//printf("start sort\n");
 	for(i = 0; i < numSongs; i++){
 		int max_ind = -1;
 		for(j = 0; j < numSongs; j++){

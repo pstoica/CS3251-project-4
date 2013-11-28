@@ -265,16 +265,16 @@ int serverCap(int sock){
 /* orders songs by popularity -- only called if CAP is set */
 void orderSongs(Song **diffSongs, int diffSongCount){
 	printf("start orderSongs - get track_list\n");
-	track *track_list = getOrderedTrackList();
-	printf("get track count\n");
-	int track_count = getTrackCount();
+	int numSongs=numSongsInDir();
+	track track_list[numSongs];
+	getOrderedTrackList(numSongs, track_list);
 	printf("malloc\n");
 	Song **ordered_diff = malloc(diffSongCount * sizeof(Song *));
 	int i, j;
 	int num_ordered = 0;
 	printf("vars malloc'd and accounted for\n");
 	
-	for(i = 0; i < track_count && num_ordered < diffSongCount; i++){
+	for(i = 0; i < numSongs && num_ordered < diffSongCount; i++){
 		bool matched = false;
 		for(j = 0; j < diffSongCount && !matched; j++){
 			if(strcmp(track_list[i].file_name, diffSongs[j]->title) == 0){
@@ -287,11 +287,12 @@ void orderSongs(Song **diffSongs, int diffSongCount){
 	
 	printf("ordered_list now in popularity order...\n");
 	
+	memcpy(&diffSongs, &ordered_diff, sizeof(ordered_diff));
+
 	for(i = 0; i < diffSongCount; i++){
-		printf("Track %i : %s -- %u \n", i, ordered_diff[i]->title, ordered_diff[i]->lenofsong);
+		printf("Track %i : %s -- %u \n", i, diffSongs[i]->title, diffSongs[i]->lenofsong);
 	}
-	
-	memcpy(diffSongs, ordered_diff, sizeof(Song *) * diffSongCount);
+	//free(ordered_diff);
 	ordered_diff = NULL;
 }
 

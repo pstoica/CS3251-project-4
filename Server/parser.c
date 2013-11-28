@@ -6,9 +6,6 @@
 
 #define BUFSIZE 10
 
-track track_list[12];
-int track_count, i, j;
-
 /**
  * This function currently only reads an XML file (assuming iTunes format)
  * and retrieves Title, Size, Play Count & Location for each track in the XML
@@ -17,9 +14,9 @@ int track_count, i, j;
  *
  * @param filename - name of the XML file to use to determine song 'popularity'
  */
-void parseXML(char *file_name){
+void parseXML(char *file_name, track *track_list){
 	int i;
-	track_count = 0;
+	int track_count = 0;
 	// Setup file handle and open file for reading
 	FILE *file = fopen(file_name, "r");
     size_t len = 0;
@@ -115,34 +112,29 @@ void parseXML(char *file_name){
     fclose(file);
 }
 
-track *getOrderedTrackList(){
-	if(track_list == NULL){	
-		printf("parse xml\n");
-		parseXML("iTunes Library.xml");
-	
-		printf("list malloc & memcpy & memset\n");
-		track *unordered_list = (track *) malloc(track_count*sizeof(track));
-		memcpy(unordered_list, track_list, sizeof(track)*track_count);
-		memset(track_list, 0, sizeof(track)*track_count);
-		int next = 0;
+track *getOrderedTrackList(int numSongs, track *track_list){
+	int track_count, i, j;
 
-		for(i = 0; i < track_count; i++){
-			int max_ind = 0;
-			for(j = 0; j < track_count; j++){
-				if(unordered_list[j].play_count > unordered_list[max_ind].play_count)
-					max_ind = j;
-			}
-			memcpy(&(track_list[next]), &(unordered_list[max_ind]), sizeof(track));
-			unordered_list[max_ind].play_count = -1;
-			next++;
+	printf("parse xml\n");
+	parseXML("iTunes Library.xml", track_list);
+
+	printf("list malloc & memcpy & memset\n");
+	track unordered_list[numSongs];
+	memcpy(&unordered_list, &track_list, sizeof(track_list));
+	//memset(track_list, 0, sizeof(track)*track_count);
+	int next = 0;
+
+	for(i = 0; i < track_count; i++){
+		int max_ind = 0;
+		for(j = 0; j < track_count; j++){
+			if(unordered_list[j].play_count > unordered_list[max_ind].play_count)
+				max_ind = j;
 		}
-	
+		track_list[next] = unordered_list[max_ind];
+		//memcpy(&(track_list[next]), &(unordered_list[max_ind]), sizeof(track));
+		unordered_list[max_ind].play_count = -1;
+		next++;
 	}
 	
 	return track_list;
 }
-
-int getTrackCount(){
-	return track_count;
-}
-

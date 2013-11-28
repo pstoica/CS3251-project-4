@@ -156,7 +156,7 @@ void *ThreadMain(void *threadArgs)
 			if(!logFile(logStr,"PULL",ip,mutex,cond,&busy))
 				fatal_error("List log file failed\n");
 			
-			if(!serverPull(clientSock, header))
+			if(!serverPull(clientSock, header, (ThreadArgs *) threadArgs))
 				fatal_error("server pull failed\n");
 		} else if(method==HEADER__METHOD_TYPE__LEAVE) {
 			fprintf(stderr,"LEAVE\n");
@@ -171,17 +171,17 @@ void *ThreadMain(void *threadArgs)
 			left = true;
 		} else if(method==HEADER__METHOD_TYPE__CAP) {
 			char *msg;
-			asprintf(&msg, "CAP %i\n", header->limit);
+			asprintf(&msg, "CAP %i\n", header->limit * 1024 * 1024);
 			fprintf(stderr,msg);
 			free(msg);
 			
-			asprintf(&msg, "CAP %i", header->limit);
+			asprintf(&msg, "CAP %i", header->limit * 1024 * 1024);
 		
 			if(!logFile(logStr,msg,ip,mutex,cond,&busy))
 				fatal_error("List log file failed\n");
 			free(msg);
 
-			((ThreadArgs*)threadArgs)->cap = header->limit;
+			((ThreadArgs*)threadArgs)->cap = (header->limit) * 1024 * 1024;
 
 			if(!serverCap(clientSock))
 				fatal_error("server cap failed\n"); 

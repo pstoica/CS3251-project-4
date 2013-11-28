@@ -201,21 +201,26 @@ int clientPull(int sock)
 		
 }
 /* server function that performs the pull method */
-int serverPull(int sock, Header *header)
+int serverPull(int sock, Header *header, ThreadArgs *settings)
 {	
 	int numSongs=numSongsInDir();
 	int diffSongCount = 0;
-	Song **diffSongs = compareSongDirProto(createSongArrayProto(numSongs), numSongs, header->songs, header->n_songs, &diffSongCount);
+	Song **diffSongs = compareSongDirProto(createSongArrayProto(numSongs), numSongs, header->songs, header->n_songs, &diffSongCount, settings);
 
 	sendHeaderProto(HEADER__METHOD_TYPE__PULL, diffSongs, diffSongCount, sock);
 	
 	int i;
 	for (i = 0; i < diffSongCount; i++) {
-		printf("opening: %s\n", diffSongs[i]->title);
-		FILE *file = fopen(diffSongs[i]->title,"r+");
-		if(!sendFile(file, sock))
-			fatal_error("receive file failed\n");
-		fclose(file);
+		// add check for skip flag to send
+		if(diffSongs[i]->caplimitskip != true || settings->cap == -1){
+			printf("opening: %s\n", diffSongs[i]->title);
+			FILE *file = fopen(diffSongs[i]->title,"r+");
+			if(!sendFile(file, sock))
+				fatal_error("receive file failed\n");
+			fclose(file);
+		} else {
+			printf("skipping: %s (CAP limit exceeded)\n", diffSongs[i]->title);
+		}
 	}
 	
 	return 1;
@@ -336,7 +341,7 @@ song *compareSongDir(song *server, int serverLen, song *client, int clientLen, i
 }
 
 /* creates an array of songs that the server has but the client does not have, server and client arrays are not freed */
-Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clientLen, int *lenOfNewArr)
+Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clientLen, int *lenOfNewArr, ThreadArgs *settings)
 {
 	int maxLen=(serverLen>clientLen)?serverLen:clientLen;
 	if (maxLen == 0) return 0;
@@ -369,7 +374,13 @@ Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clie
 		{
 			maxList[numDiff] = server[s];
 			/* Add CAP check here */
-			/* Set maxList[numDiff].capLimitSkip = true */
+			if(maxList[numDiff]->lenofsong > settings->cap && settings->cap > -1){
+				maxList[numDiff]->caplimitskip = true;
+			} else {
+				maxList[numDiff]->caplimitskip = false;
+				if(settings->cap != -1)
+					settings->cap = settings->cap - maxList[numDiff]->lenofsong;
+			}
 			numDiff++;
 		}
 		s++;
@@ -380,7 +391,6 @@ Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clie
 	if(!lenOfNewArr)
 	{
 		free(maxList);
-		return 0;
 	}
 
 	if(maxLen!=serverLen)

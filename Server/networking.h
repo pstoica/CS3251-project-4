@@ -52,7 +52,7 @@ int serverList(int sock);
 int clientDiff(int sock);
 int serverDiff(int sock);
 int clientPull(int sock);
-int serverPull(int sock, Header *header);
+int serverPull(int sock, Header *header, ThreadArgs *settings);
 int clientLeave(int sock);
 int serverLeave(int sock);
 int serverCap(int sock);
@@ -62,7 +62,7 @@ int fileLen(FILE *file);
 int logFile(char *fileName, char *method, char *ip, pthread_mutex_t *mutex, pthread_cond_t *cond, int *busy);
 
 song *compareSongDir(song *server, int serverLen, song *client, int clientLen, int *lenOfNewArr);
-Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clientLen, int *lenOfNewArr);
+Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clientLen, int *lenOfNewArr, ThreadArgs *settings);
 int numSongsInDir();
 song *createSongArray(int numSongs);
 int calculateChecksum(FILE *file,song *s);

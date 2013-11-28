@@ -371,13 +371,14 @@ Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clie
 			c++;
 		}
 		if(!found)
-		{
+		{	
 			maxList[numDiff] = server[s];
 			/* Add CAP check here */
 			if(maxList[numDiff]->lenofsong > settings->cap && settings->cap > -1){
+				maxList[numDiff]->has_caplimitskip = true;
 				maxList[numDiff]->caplimitskip = true;
 			} else {
-				maxList[numDiff]->caplimitskip = false;
+				maxList[numDiff]->has_caplimitskip = false;
 				if(settings->cap != -1)
 					settings->cap = settings->cap - maxList[numDiff]->lenofsong;
 			}

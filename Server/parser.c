@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <libgen.h>
 #include <stdbool.h>
 #include <regex.h>
 #include "parser.h"			/*structs and methods defined*/
@@ -59,7 +60,7 @@ void parseXML(char *file_name, track *track_list){
 			end_len = strlen("</integer>");
 			val_len = strlen(line) - start_len - end_len - spaces - 1;
 			strncpy(val, line + start_len + spaces, val_len);
-			//printf("%s -- ", val);
+			printf("%s -- ", val);
 			unsigned int nval = atoi(val);
 			
 			track_list[track_count].size = (size_t) nval;
@@ -74,7 +75,7 @@ void parseXML(char *file_name, track *track_list){
 				end_len = strlen("</integer>");
 				val_len = strlen(line) - start_len - end_len - spaces - 1;
 				strncpy(val, line + start_len + spaces, val_len);
-				//printf("%s \n", val);
+				printf("%s \n", val);
 			
 				unsigned int nval = atoi(val);
 				track_list[track_count].play_count = nval;
@@ -89,19 +90,40 @@ void parseXML(char *file_name, track *track_list){
 					end_len = strlen("</string>");
 					val_len = strlen(line) - start_len - end_len - spaces - 1;
 					strncpy(val, line + start_len + spaces, val_len);
-					//printf("%s \n", val);
+					printf("%s \n", val);
 			
 					char *temp = (char *) basename(val);
-					char *title = (char *) malloc(sizeof(temp));
-					memset(title, 0, sizeof(title));
+					char *title = (char *) malloc((strlen(temp) + 1)* sizeof(char));
+					printf("memset title 0\n");
+					memset(title, 0, (strlen(temp) + 1) * sizeof(char));
+					printf("%s\n", title);
+					printf("%s\n", temp);
+					printf("strtok\n");
+
+					int new_string_len = 0;
+					int old_string_len = strlen(temp);
+					for (int i = 0; i < old_string_len; i++) {
+						if ((i + 2) < old_string_len && temp[i] == '%' && temp[i + 1] == '2' && temp[i + 2] == '0') {
+							title[new_string_len] = ' ';
+							i += 2;
+						} else {
+							title[new_string_len] = temp[i];
+						}
+
+						new_string_len++;
+					}
+
+					title[new_string_len] = '\0';
+					/*
 					char *tok = strtok(temp, "%20");
 					while(tok != NULL){
 						title = strcat(title, " ");
 						title = strcat(title, tok);
 						tok = strtok(NULL, "%20");
-					}
-			
-					//printf("filename %s\n", title);
+						printf("%s\n", title);
+					}*/
+
+					printf("filename %s\n", title);
 					track_list[track_count].file_name = title;
 					track_count++;
 				}

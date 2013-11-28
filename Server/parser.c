@@ -114,14 +114,6 @@ void parseXML(char *file_name, track *track_list){
 					}
 
 					title[new_string_len] = '\0';
-					/*
-					char *tok = strtok(temp, "%20");
-					while(tok != NULL){
-						title = strcat(title, " ");
-						title = strcat(title, tok);
-						tok = strtok(NULL, "%20");
-						printf("%s\n", title);
-					}*/
 
 					printf("filename %s\n", title);
 					track_list[track_count].file_name = title;

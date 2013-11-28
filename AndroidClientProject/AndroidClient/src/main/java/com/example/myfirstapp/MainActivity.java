@@ -384,16 +384,17 @@ public class MainActivity extends Activity {
                 result += "No files pulled.\n";
             } else {
                 for (Song song : response.songs) {
-                    if(song.caplimitskip == null)
-                        Log.d("PULL", "CAP Skip Limit flag = NULL");
-                    else
-                        Log.d("PULL", "CAP Skip Limit flag = " + song.caplimitskip);
-                    //if(!song.caplimitskip){
+                    if(song.caplimitskip == null){
                         receiveFile(song);
                         result += "Received: " + song.title + "\n";
-                    //} else {
-                    //    result += "Skipped (CAP Limit): " + song.title + "\n";
-                    //}
+                    } else {
+                        if(song.caplimitskip != true){
+                            receiveFile(song);
+                            result += "Received: " + song.title + "\n";
+                        } else {
+                            result += "Skipped (CAP Limit): " + song.title + "\n";
+                        }
+                    }
                 }
             }
 

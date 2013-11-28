@@ -191,7 +191,7 @@ const ProtobufCMessageDescriptor header__descriptor =
   (ProtobufCMessageInit) header__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor song__field_descriptors[3] =
+static const ProtobufCFieldDescriptor song__field_descriptors[4] =
 {
   {
     "title",
@@ -218,7 +218,7 @@ static const ProtobufCFieldDescriptor song__field_descriptors[3] =
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "lenOfSong",
+    "lenofsong",
     3,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_INT32,
@@ -229,16 +229,29 @@ static const ProtobufCFieldDescriptor song__field_descriptors[3] =
     0,            /* packed */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
+  {
+    "caplimitskip",
+    4,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_BOOL,
+    PROTOBUF_C_OFFSETOF(Song, has_caplimitskip),
+    PROTOBUF_C_OFFSETOF(Song, caplimitskip),
+    NULL,
+    NULL,
+    0,            /* packed */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
 };
 static const unsigned song__field_indices_by_name[] = {
+  3,   /* field[3] = caplimitskip */
   1,   /* field[1] = checksum */
-  2,   /* field[2] = lenOfSong */
+  2,   /* field[2] = lenofsong */
   0,   /* field[0] = title */
 };
 static const ProtobufCIntRange song__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 3 }
+  { 0, 4 }
 };
 const ProtobufCMessageDescriptor song__descriptor =
 {
@@ -248,7 +261,7 @@ const ProtobufCMessageDescriptor song__descriptor =
   "Song",
   "",
   sizeof(Song),
-  3,
+  4,
   song__field_descriptors,
   song__field_indices_by_name,
   1,  song__number_ranges,

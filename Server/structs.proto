@@ -16,4 +16,5 @@ message Song {
 	required string title = 1;
 	required bytes checksum = 2;
 	required int32 lenofsong = 3;
+	optional bool caplimitskip = 4;
 }

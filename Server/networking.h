@@ -15,6 +15,7 @@
 #include <dirent.h>					/* for determining files in current directory */
 #include <protobuf-c/protobuf-c.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include "structs.pb-c.h"
 
  
@@ -36,6 +37,7 @@ typedef struct {
 	char title[TITLELEN]; //length subject to change
 	unsigned char checksum[SHA256_DIGEST_LENGTH];		/* computed checksum of the song */
 	int lenOfSong;	/* length in bytes of the actual music file */	
+	bool capLimitSkip;	/* Flag that indicates if a song was skipped in a PULL due to the CAP */
 } song;
 
 /* Struct for arguments that will be passed to client */

@@ -46,10 +46,12 @@ struct  _Song
   char *title;
   ProtobufCBinaryData checksum;
   int32_t lenofsong;
+  protobuf_c_boolean has_caplimitskip;
+  protobuf_c_boolean caplimitskip;
 };
 #define SONG__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&song__descriptor) \
-    , NULL, {0,NULL}, 0 }
+    , NULL, {0,NULL}, 0, 0,0 }
 
 
 /* Header methods */

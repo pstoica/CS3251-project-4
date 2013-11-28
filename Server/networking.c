@@ -368,7 +368,8 @@ Song **compareSongDirProto(Song **server, int serverLen, Song **client, int clie
 		if(!found)
 		{
 			maxList[numDiff] = server[s];
-			//memcpy(maxList[numDiff],server[s],sizeof(*server[s]));
+			/* Add CAP check here */
+			/* Set maxList[numDiff].capLimitSkip = true */
 			numDiff++;
 		}
 		s++;

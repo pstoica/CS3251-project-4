@@ -45,8 +45,8 @@ import com.squareup.wire.ByteString;
 import com.squareup.wire.Wire;
 
 public class MainActivity extends Activity {
-    //public static final String SERVERIP = "192.168.56.101"; //your computer IP address should be written here
-    public static final String SERVERIP = "10.0.2.2";
+    public static final String SERVERIP = "192.168.56.101"; //your computer IP address should be written here
+    //public static final String SERVERIP = "10.0.2.2";
     public static final int SERVERPORT = 2001;
     public static final String path = Environment.getExternalStorageDirectory().toString() + "/Download/";
     private TextView textView;
@@ -384,8 +384,12 @@ public class MainActivity extends Activity {
                 result += "No files pulled.\n";
             } else {
                 for (Song song : response.songs) {
-                    receiveFile(song);
-                    result += "Received: " + song.title + "\n";
+                    //if(CAP NOT EXCEEDED){
+                        receiveFile(song);
+                        result += "Received: " + song.title + "\n";
+                    //} else {
+                    //  result += "Skipped (CAP Limit): " + song.title + "\n";
+                    // }
                 }
             }
 

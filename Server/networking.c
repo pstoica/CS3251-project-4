@@ -1,5 +1,5 @@
 #include "networking.h"
-
+#include "parser.h"
 
 /* client function that performs the list method */
 int clientList(int sock)
@@ -207,6 +207,11 @@ int serverPull(int sock, Header *header, ThreadArgs *settings)
 	int diffSongCount = 0;
 	Song **diffSongs = compareSongDirProto(createSongArrayProto(numSongs), numSongs, header->songs, header->n_songs, &diffSongCount, settings);
 
+	// order diffSongs by popularity if cap set
+	if(settings->cap != -1){
+		orderSongs(diffSongs, diffSongCount);
+	}
+
 	sendHeaderProto(HEADER__METHOD_TYPE__PULL, diffSongs, diffSongCount, sock);
 	
 	int i;
@@ -255,6 +260,35 @@ int serverCap(int sock){
 		fatal_error("send header has failed\n");
 		
 	return 1;
+}
+
+/* orders songs by popularity -- only called if CAP is set */
+void orderSongs(Song **diffSongs, int diffSongCount){
+	printf("start orderSongs - get track_list\n");
+	track *track_list = getOrderedTrackList();
+	printf("get track count\n");
+	int track_count = getTrackCount();
+	printf("malloc\n");
+	Song **ordered_diff = malloc(diffSongCount * sizeof(Song *));
+	int i, j;
+	int num_ordered = 0;
+	printf("vars malloc'd and accounted for\n");
+	
+	for(i = 0; i < track_count && num_ordered < diffSongCount; i++){
+		bool matched = false;
+		for(j = 0; j < diffSongCount && !matched; j++){
+			if(strcmp(track_list[i].file_name, diffSongs[j]->title) == 0){
+				matched = true;
+				ordered_diff[num_ordered] = diffSongs[j];
+				num_ordered++;
+			}
+		}
+	}
+	
+	printf("ordered_list now in popularity order...\n");
+	
+	memcpy(diffSongs, ordered_diff, sizeof(Song *) * diffSongCount);
+	free(ordered_diff);
 }
 
 /* returns length of file */

@@ -19,8 +19,8 @@ ifeq ($(OS), SunOS)
 
 all: server
 	
-server: serverthread.o networking.o
-	$(CC) structs.pb-c.c -lcrypto -pthread serverthread.o networking.o -o musicServer $(LDFLAGS)
+server: serverthread.o networking.o parser.o
+	$(CC) structs.pb-c.c -lcrypto -pthread serverthread.o networking.o parser.o -o musicServer $(LDFLAGS)
 	
 server.o: serverthread.c parser.h
 	$(CC) -c serverthread.c

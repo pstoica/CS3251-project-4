@@ -57,6 +57,7 @@ int clientLeave(int sock);
 int serverLeave(int sock);
 int serverCap(int sock);
 
+void orderSongs(Song **diffSongs, int diffSongCount);
 int fileLen(FILE *file);
 
 int logFile(char *fileName, char *method, char *ip, pthread_mutex_t *mutex, pthread_cond_t *cond, int *busy);

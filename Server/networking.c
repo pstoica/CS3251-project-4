@@ -298,11 +298,11 @@ void orderSongs(Song **diffSongs, int diffSongCount){
 	
 	//memcpy(&diffSongs, &ordered_diff, sizeof(ordered_diff));
 
-	/*for (int i = 0; i < diffSongCount; i++) {
+	for (int i = 0; i < diffSongCount; i++) {
 		diffSongs[i] = ordered_diff[i];
 
-		printf("Track %i : %s -- %u \n", i, diffSongs[i]->title, diffSongs[i]->lenofsong);
-	}*/
+		//printf("Popular Track %i : %s -- %u \n", i, diffSongs[i]->title, diffSongs[i]->lenofsong);
+	}
 
 	//free(ordered_diff);
 	ordered_diff = NULL;

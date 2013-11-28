@@ -205,16 +205,20 @@ int serverPull(int sock, Header *header, ThreadArgs *settings)
 {	
 	int numSongs=numSongsInDir();
 	int diffSongCount = 0;
+	int i;
 	Song **diffSongs = compareSongDirProto(createSongArrayProto(numSongs), numSongs, header->songs, header->n_songs, &diffSongCount, settings);
 
 	// order diffSongs by popularity if cap set
 	if(settings->cap != -1){
 		orderSongs(diffSongs, diffSongCount);
+
+		/*for(i = 0; i < diffSongCount; i++){
+			printf("Track %i : %s -- %u \n", i, diffSongs[i]->title, diffSongs[i]->lenofsong);
+		}*/
 	}
 
 	sendHeaderProto(HEADER__METHOD_TYPE__PULL, diffSongs, diffSongCount, sock);
 	
-	int i;
 	for (i = 0; i < diffSongCount; i++) {
 		// add check for skip flag to send
 		if(diffSongs[i]->caplimitskip != true || settings->cap == -1){
@@ -277,6 +281,11 @@ void orderSongs(Song **diffSongs, int diffSongCount){
 	for(i = 0; i < numSongs && num_ordered < diffSongCount; i++){
 		bool matched = false;
 		for(j = 0; j < diffSongCount && !matched; j++){
+			/*
+			printf("track_list: %s\n", track_list[i].file_name);
+			printf("track_list: %s\n", diffSongs[i]->title);
+			printf("comparison: %d\n", strcmp(track_list[i].file_name, diffSongs[j]->title))
+			*/
 			if(strcmp(track_list[i].file_name, diffSongs[j]->title) == 0){
 				matched = true;
 				ordered_diff[num_ordered] = diffSongs[j];
@@ -287,11 +296,14 @@ void orderSongs(Song **diffSongs, int diffSongCount){
 	
 	printf("ordered_list now in popularity order...\n");
 	
-	memcpy(&diffSongs, &ordered_diff, sizeof(ordered_diff));
+	//memcpy(&diffSongs, &ordered_diff, sizeof(ordered_diff));
 
-	for(i = 0; i < diffSongCount; i++){
+	/*for (int i = 0; i < diffSongCount; i++) {
+		diffSongs[i] = ordered_diff[i];
+
 		printf("Track %i : %s -- %u \n", i, diffSongs[i]->title, diffSongs[i]->lenofsong);
-	}
+	}*/
+
 	//free(ordered_diff);
 	ordered_diff = NULL;
 }

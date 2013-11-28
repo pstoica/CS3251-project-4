@@ -39,7 +39,7 @@ void parseXML(char *file_name, track *track_list){
     // Read the file while there are still unseen track entries
     //  or until file runs out of lines
     while((read = getline(&line, &len, file) != -1)){
-    	printf("%i \n", track_count);
+    	//printf("%i \n", track_count);
     	fflush(stdout);
     	// Handle any leading spaces
     	const char* firstNonSpace = line;
@@ -60,7 +60,7 @@ void parseXML(char *file_name, track *track_list){
 			end_len = strlen("</integer>");
 			val_len = strlen(line) - start_len - end_len - spaces - 1;
 			strncpy(val, line + start_len + spaces, val_len);
-			printf("%s -- ", val);
+			//printf("%s -- ", val);
 			unsigned int nval = atoi(val);
 			
 			track_list[track_count].size = (size_t) nval;
@@ -75,7 +75,7 @@ void parseXML(char *file_name, track *track_list){
 				end_len = strlen("</integer>");
 				val_len = strlen(line) - start_len - end_len - spaces - 1;
 				strncpy(val, line + start_len + spaces, val_len);
-				printf("%s \n", val);
+				//printf("%s \n", val);
 			
 				unsigned int nval = atoi(val);
 				track_list[track_count].play_count = nval;
@@ -90,15 +90,10 @@ void parseXML(char *file_name, track *track_list){
 					end_len = strlen("</string>");
 					val_len = strlen(line) - start_len - end_len - spaces - 1;
 					strncpy(val, line + start_len + spaces, val_len);
-					printf("%s \n", val);
 			
 					char *temp = (char *) basename(val);
 					char *title = (char *) malloc((strlen(temp) + 1)* sizeof(char));
-					printf("memset title 0\n");
 					memset(title, 0, (strlen(temp) + 1) * sizeof(char));
-					printf("%s\n", title);
-					printf("%s\n", temp);
-					printf("strtok\n");
 
 					int new_string_len = 0;
 					int old_string_len = strlen(temp);
@@ -115,7 +110,6 @@ void parseXML(char *file_name, track *track_list){
 
 					title[new_string_len] = '\0';
 
-					printf("filename %s\n", title);
 					track_list[track_count].file_name = title;
 					track_count++;
 				}
@@ -127,25 +121,25 @@ void parseXML(char *file_name, track *track_list){
 }
 
 track *getOrderedTrackList(int numSongs, track *track_list){
-	int track_count, i, j;
+	int i, j;
 
-	printf("parse xml\n");
 	parseXML("iTunes Library.xml", track_list);
 
-	printf("list malloc & memcpy & memset\n");
 	track unordered_list[numSongs];
-	memcpy(&unordered_list, &track_list, sizeof(track_list));
+	//memcpy(&unordered_list, &track_list, sizeof(track_list));
+	for (i = 0; i < numSongs; i++) {
+		unordered_list[i] = track_list[i];
+	}
 	//memset(track_list, 0, sizeof(track)*track_count);
 	int next = 0;
 
-	for(i = 0; i < track_count; i++){
-		int max_ind = 0;
-		for(j = 0; j < track_count; j++){
-			if(unordered_list[j].play_count > unordered_list[max_ind].play_count)
+	for(i = 0; i < numSongs; i++){
+		int max_ind = -1;
+		for(j = 0; j < numSongs; j++){
+			if(unordered_list[j].play_count != -1 && (max_ind == -1 || unordered_list[j].play_count > unordered_list[max_ind].play_count))
 				max_ind = j;
 		}
 		track_list[next] = unordered_list[max_ind];
-		//memcpy(&(track_list[next]), &(unordered_list[max_ind]), sizeof(track));
 		unordered_list[max_ind].play_count = -1;
 		next++;
 	}

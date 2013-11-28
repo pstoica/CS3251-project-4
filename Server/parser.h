@@ -31,7 +31,7 @@ typedef struct {
 } track;
 
 void parseXML(char *file_name, track *track_list);
-track *getOrderTrackList(int numSongs, track *track_list);
+track *getOrderedTrackList(int numSongs, track *track_list);
 
 
 #endif/*_PARSER_H_*/
